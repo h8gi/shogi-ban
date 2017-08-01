@@ -1,6 +1,6 @@
 # syogi-ban
 
-> syogi ban
+> 将棋盤
 
 ## Build Setup
 

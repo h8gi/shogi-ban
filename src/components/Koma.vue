@@ -1,10 +1,9 @@
 <template>
   <div class="koma"
-       :class="isReverse(info.color) ? 'reverse' : ''"
-       draggable="true"
-       @click="toggleClick"
-       @mousemove="move">
-    {{komas[info.kind].kanji}}
+       :class="className"
+       @click="click"
+       >
+    {{komas[contents.kind].kanji}}
   </div>
 </template>
 
@@ -13,7 +12,7 @@ export default {
   name: 'koma',
   components: {
   },
-  props: ['info', 'reverse', 'x', 'y'],
+  props: ['contents', 'reverse', 'x', 'y'],
   data () {
     return {
       komas: {
@@ -35,20 +34,22 @@ export default {
       clicked: false
     }
   },
+  computed: {
+    className () {
+      let cls = ''
+      cls += this.clicked ? 'clicked ' : ''
+      cls += this.isReverse(this.contents.color) ? 'reverse ' : ''
+      return cls
+    }
+  },
   methods: {
     isReverse (color) {
       return this.reverse ? color === 0 : color === 1
-    },
+    },    
     validMove () {
     },
-    toggleClick (e) {
-      e.target.classList.toggle('clicked')
-      this.clicked = !this.clicked
-    },
-    move (e) {
-      if (this.clicked) {
-        console.log(e)
-      }
+    click (e) {      
+      this.$emit('koma-clicked', this.contents)
     }
   }
 }
@@ -62,11 +63,18 @@ export default {
   -webkit-user-select: none;
   user-select: none;
 }
-.koma {  
+.koma {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently */
+  
   cursor: pointer;
   width: 50px;
-  height: 37px;
-  padding-top: 13px;
+  height: 50px;
+  font-size: 2.1em;
   &.reverse {
     transform: rotate(180deg);  
   }
@@ -75,7 +83,8 @@ export default {
   }
 
   &.clicked {
-    position: absolute;
+    font-weight: bold;
+    background-color: #eee;
   }
 }
 

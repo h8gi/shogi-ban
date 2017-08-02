@@ -3,10 +3,12 @@
     <tr v-for="y in (reverse ? gyaku : jun)">
       <td v-for="x in (reverse ? jun : gyaku)" class="masu" :class="masuClass(x, y)"
           :data-x="x" :data-y="y"
-          :data-x-label="x" :data-y-label="kansuji[y]">
+          :data-x-label="x" :data-y-label="kansuji[y]"
+          @click="put">
         <koma v-if="x !== 0 && y !== 0 && boardData[x-1][y-1].kind"
               :x="x" :y="y"
-              :info="boardData[x-1][y-1]" :reverse="reverse">
+              :contents="boardData[x-1][y-1]" :reverse="reverse"
+              @koma-clicked="komaClicked">
         </koma>
       </td>
     </tr>
@@ -24,7 +26,8 @@ export default {
     return {
       kansuji: ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'],
       jun: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-      gyaku: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+      gyaku: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
+      selectedCount: 0
     }
   },
   props: ['boardData', 'reverse', 'showNum'],
@@ -59,6 +62,12 @@ export default {
       } else {
         return ''
       }
+    },
+    put () {
+      console.log('put')
+    },
+    hoge () {
+      console.log('hoge')
     }
   }
 }

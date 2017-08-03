@@ -1,21 +1,28 @@
 <template>
-  <table class="board">
-    <tr v-for="y in (reverse ? gyaku : jun)">
-      <td v-for="x in (reverse ? jun : gyaku)" class="masu" :class="masuClass(x, y)"
-          :data-x="x" :data-y="y"
-          :data-x-label="x" :data-y-label="kansuji[y]"
-          @click="put">
-        <koma v-if="x !== 0 && y !== 0 && boardData[x-1][y-1].kind"
-              :x="x" :y="y"
-              :contents="boardData[x-1][y-1]" :reverse="reverse"
-              @koma-clicked="komaClicked">
-        </koma>
-      </td>
-    </tr>
-  </table>
+  <div>
+    <table class="board">
+      <tr v-for="y in (reverse ? gyaku : jun)">
+        <td v-for="x in (reverse ? jun : gyaku)" class="masu" :class="masuClass(x, y)"
+            :data-x="x" :data-y="y"
+            :data-x-label="x" :data-y-label="kansuji(y)"
+            @click="masuClicked({x: x, y: y}, $event)"
+            >
+          <koma v-if="x !== 0 && y !== 0 && !boardData.isEmptyAt({x: x, y: y})"
+                :pos="{x: x, y: y}"
+                :contents="boardData.komaAt({x: x, y: y})" :reverse="reverse"
+                @koma-clicked="komaClicked">
+          </koma>
+        </td>
+      </tr>
+    </table>
+    <p>
+      selected: {{ selectedKoma }}
+    </p>
+  </div>
 </template>
 
 <script>
+import syogi from '@/syogi-lib'
 import Koma from '@/components/Koma.vue'
 export default {
   name: 'board',
@@ -24,17 +31,14 @@ export default {
   },
   data () {
     return {
-      kansuji: ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'],
       jun: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       gyaku: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
-      selectedCount: 0
+      selectedKoma: syogi.Koma.empty(),
+      selectedMasu: {},
     }
   },
   props: ['boardData', 'reverse', 'showNum'],
   methods: {
-    isEdge (x, y) {
-      return x === 1 || x === 9 || y === 1 || y === 9
-    },
     isHeader (x, y) {
       return x === 0 || y === 0
     },
@@ -45,7 +49,7 @@ export default {
         cls += x === 0 ? 'y-header ' : ''
         cls += y === 0 ? 'x-header ' : ''
         return cls
-      } else if (this.isEdge(x, y)) {
+      } else if (syogi.Board.isEdge({x: x, y: y})) {
         let cls = 'edge '
         if (this.reverse) {
           cls += x === 9 ? 'right ' : ''
@@ -63,11 +67,35 @@ export default {
         return ''
       }
     },
-    put () {
-      console.log('put')
+    masuClicked (pos, e) {
+      if ( syogi.Koma.isEmpty(this.selectedKoma) ) { // koma is not selected.
+        if ( !this.boardData.isEmptyAt(pos) ) { // there are koma at pos.
+          this.selectedKoma = this.boardData.komaAt(pos)
+          this.selectedMasu = pos
+          e.target.classList.add('selected')
+        }
+      } else { // koma is already selected.
+        if ( this.boardData.isEmptyAt(pos) ) {
+          // remove koma from the old position.
+          this.boardData.take(this.selectedMasu)
+          
+          // put koma at the new position.
+          this.boardData.put(pos, this.selectedKoma)
+          
+          // clear the selected koma & masu.
+          this.selectedKoma = syogi.Koma.empty()
+          this.selectedMasu = {}
+        }
+      }
+    },
+    komaClicked (contents, e) {
+      console.log(contents, e.target)
     },
     hoge () {
       console.log('hoge')
+    },
+    kansuji (i) {
+      return syogi.kansuji(i)
     }
   }
 }
@@ -116,6 +144,6 @@ table.board {
     &.bottom {
       border-bottom: solid 2px #000;
     }
-  } 
+  }
 }
 </style>

@@ -3,35 +3,20 @@
        :class="className"
        @click="click"
        >
-    {{komas[contents.kind].kanji}}
+    {{koma.kanji}}
   </div>
 </template>
 
 <script>
+import syogi from '@/syogi-lib'
 export default {
   name: 'koma',
   components: {
   },
-  props: ['contents', 'reverse', 'x', 'y'],
+  // contents is syogi.Koma.
+  props: ['contents', 'reverse', 'pos'],
   data () {
-    return {
-      komas: {
-        'FU': {kanji: '歩'},
-        'KY': {kanji: '香'},
-        'KE': {kanji: '桂'},
-        'GI': {kanji: '銀'},
-        'KI': {kanji: '金'},
-        'KA': {kanji: '角'},
-        'HI': {kanji: '飛'},
-        'OU': {kanji: '玉'},
-        'TO': {kanji: 'と'},
-        'NY': {kanji: '杏'},
-        'NK': {kanji: '圭'},
-        'NG': {kanji: '全'},
-        'UM': {kanji: '馬'},
-        'RY': {kanji: '竜'}
-      },
-      clicked: false
+    return {    
     }
   },
   computed: {
@@ -40,6 +25,9 @@ export default {
       cls += this.clicked ? 'clicked ' : ''
       cls += this.isReverse(this.contents.color) ? 'reverse ' : ''
       return cls
+    },
+    koma () {
+      return new syogi.Koma(this.contents.color, this.contents.kind)
     }
   },
   methods: {
@@ -49,7 +37,7 @@ export default {
     validMove () {
     },
     click (e) {      
-      this.$emit('koma-clicked', this.contents)
+      this.$emit('koma-clicked', this.contents, e)
     }
   }
 }
@@ -72,8 +60,8 @@ export default {
   user-select: none; /* Non-prefixed version, currently */
   
   cursor: pointer;
-  width: 50px;
-  height: 50px;
+  width: 100%;
+  height: 100%;
   font-size: 2.1em;
   &.reverse {
     transform: rotate(180deg);  
@@ -82,7 +70,7 @@ export default {
   &.dragging {
   }
 
-  &.clicked {
+  &.clicked, &.selected {
     font-weight: bold;
     background-color: #eee;
   }

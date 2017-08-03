@@ -9,6 +9,7 @@
 
 <script>
 import Board from '@/components/Board'
+import syogi from '@/syogi-lib'
 export default {
   name: 'home',
   components: {
@@ -16,26 +17,15 @@ export default {
   },
   data () {
     return {
-      boardData:  [
-        [{"color":1, "kind":"KY"}, {                      },{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {                      }, {"color":0, "kind":"KY"}],
-        [{"color":1, "kind":"KE"}, {"color":1, "kind":"KA"},{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {"color":0, "kind":"HI"}, {"color":0, "kind":"KE"}],
-        [{"color":1, "kind":"GI"}, {                      },{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {                      }, {"color":0, "kind":"GI"}],
-        [{"color":1, "kind":"KI"}, {                      },{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {                      }, {"color":0, "kind":"KI"}],
-        [{"color":1, "kind":"OU"}, {                      },{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {                      }, {"color":0, "kind":"OU"}],
-        [{"color":1, "kind":"KI"}, {                      },{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {                      }, {"color":0, "kind":"KI"}],
-        [{"color":1, "kind":"GI"}, {                      },{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {                      }, {"color":0, "kind":"GI"}],
-        [{"color":1, "kind":"KE"}, {"color":1, "kind":"HI"},{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {"color":0, "kind":"KA"}, {"color":0, "kind":"KE"}],
-        [{"color":1, "kind":"KY"}, {                      },{"color":1, "kind":"FU"}, {}, {}, {}, {"color":0, "kind":"FU"}, {                      }, {"color":0, "kind":"KY"}]
-      ],
+      boardData: syogi.boardPresets.HIRATE,
       reverse: false,
       showNum: true
     }
   },
   methods: {
     runMove (move) {
-      let komainfo = this.boardData[move.from.x-1][move.from.y-1]
-      this.boardData[move.from.x-1].splice(move.from.y-1, 1, {})
-      this.boardData[move.to.x-1].splice(move.to.y-1, 1, komainfo)
+      let koma = this.boardData.take(move.from)
+      this.boardData.put(move.to, koma)
     },
     movetest () {
       this.runMove({from: {x: 3, y: 3}, to: {x: 3, y: 4}})

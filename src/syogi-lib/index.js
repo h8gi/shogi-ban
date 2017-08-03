@@ -1,3 +1,4 @@
+// https://github.com/na2hiro/json-kifu-format
 class Board {
   constructor (contents) {
     this.contents = contents

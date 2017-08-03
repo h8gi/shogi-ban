@@ -18,16 +18,22 @@
     <p>
       selected: {{ selectedKoma }}
     </p>
+    <!-- 先手 -->
+    <hands :turn="this.turn" color="0" :contents="hands[0]"></hands>
+    <!-- 後手 -->
+    <hands :turn="this.turn" color="1" :contents="hands[1]"></hands>
   </div>
 </template>
 
 <script>
 import syogi from '@/syogi-lib'
 import Koma from '@/components/Koma.vue'
+import Hands from '@/components/Hands.vue'
 export default {
   name: 'board',
   components: {
-    Koma
+    Koma,
+    Hands
   },
   data () {
     return {
@@ -38,7 +44,7 @@ export default {
       turn: 0
     }
   },
-  props: ['boardData', 'reverse', 'showNum'],
+  props: ['boardData', 'reverse', 'showNum', 'hands'],
   methods: {
     isHeader (x, y) {
       return x === 0 || y === 0

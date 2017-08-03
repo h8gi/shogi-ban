@@ -110,5 +110,9 @@ export default {
       return false
     }
     return true
+  },
+
+  changeTurn (turn) {
+    return turn === 0 ? 1 : 0
   }
 }

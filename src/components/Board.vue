@@ -35,6 +35,7 @@ export default {
       gyaku: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
       selectedKoma: syogi.Koma.empty(),
       selectedMasu: {},
+      turn: 0
     }
   },
   props: ['boardData', 'reverse', 'showNum'],
@@ -85,6 +86,8 @@ export default {
           // clear the selected koma & masu.
           this.selectedKoma = syogi.Koma.empty()
           this.selectedMasu = {}
+          // the move is done.
+          this.turn = syogi.changeTurn(this.turn)
         }
       }
     },

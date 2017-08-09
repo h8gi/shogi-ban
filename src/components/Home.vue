@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <button @click="movetest">test</button>
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
@@ -47,9 +46,6 @@ export default {
         return false
       }
       return !(move.from.x === move.to.x && move.from.y === move.to.y)
-    },
-    movetest () {
-      this.runMove({from: {x: 3, y: 3}, to: {x: 3, y: 4}})
     },
     invert () {
       this.reverse = (!this.reverse)

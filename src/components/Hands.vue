@@ -1,6 +1,10 @@
 <template>
   <div :class="'h'+color">
-    {{contents}}
+    <div v-for="(count, kind) in contents"
+         v-if="count !== 0"
+         :class="'hands-'+kind" >
+      {{kanji(kind) + " " + count}}
+    </div>
   </div>
 </template>
 
@@ -18,6 +22,9 @@ export default {
   computed: {
   },
   methods: {
+    kanji (kind) {
+      return syogi.Koma.kanji(kind)
+    }
   }
 }
 </script>

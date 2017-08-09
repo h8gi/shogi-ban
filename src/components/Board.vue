@@ -181,9 +181,11 @@ table.board {
       border-bottom: solid 2px #000;
     }
   }
-  td.selected {
-    color: #fff;
-    background: #000;
-  }
+}
+.t0 {
+  .h0 { font-weight: bold; }
+}
+.t1 {
+  .h1 { font-weight: bold; }
 }
 </style>

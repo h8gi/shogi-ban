@@ -104,6 +104,10 @@ class Koma {
     return Object.keys(koma).length === 0
   }
 
+  static kanji (kind) {
+    return komaMap[kind].kanji
+  }
+
   static empty () {
     return {}
   }

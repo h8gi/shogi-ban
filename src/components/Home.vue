@@ -5,8 +5,8 @@
     <button @click="toggleNum">盤数字</button>
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            :checked="checked"
-           @move="runMove"></board>
-    {{turn}} <br/>
+           @move="runMove"
+           :class="'t'+turn"></board>
     {{moves}}
   </div>
 </template>

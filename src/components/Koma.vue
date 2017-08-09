@@ -1,8 +1,7 @@
 <template>
   <div class="koma"
        :class="className"
-       @click.self="click"
-       >
+       @click.self="click">
     {{koma.kanji}}
   </div>
 </template>
@@ -21,7 +20,7 @@ export default {
   },
   computed: {
     className () {
-      let cls = ''
+      let cls = 'k' + this.contents.color + ' '
       cls += this.clicked ? 'clicked ' : ''
       cls += this.isReverse(this.contents.color) ? 'reverse ' : ''
       return cls
@@ -63,18 +62,18 @@ export default {
   /* pointer-events: none; */
   width: 100%;
   height: 100%;
-  font-size: 2.1em;
+  font-size: 2em;
   &.reverse {
     transform: rotate(180deg);  
   }
 
   &.dragging {
-  }
+  }  
+}
 
-  &.clicked, &.selected {
-    font-weight: bold;
-    background-color: #eee;
-  }
+.t0 .k0.selected, .t1 .k1.selected {
+  font-weight: bold;
+  background-color: #eee;
 }
 
 </style>

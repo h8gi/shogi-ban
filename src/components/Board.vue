@@ -53,12 +53,12 @@ export default {
       return new syogi.Koma(this.move.color, this.move.piece)
     },
   },
-  props: ['boardData', 'reverse', 'showNum', 'checked'],
+  props: ['boardData', 'reverse', 'showNum', 'checked', 'turn'],
   watch: {
     checked (val) {
       if (val.valid) {
         console.log('valid move!:', JSON.stringify(val.move) )
-        this.boardData.runMove(val.move)
+        this.boardData.runMove(val.move)        
       } else {
         console.log('invalid move!')        
       }
@@ -71,7 +71,7 @@ export default {
     masuClass (x, y) {
       if (this.isHeader(x, y)) {
         let cls = 'header '
-        cls += this.showNum ? 'hide ' : ''
+        cls += this.showNum ? '' : 'hide '
         cls += x === 0 ? 'y-header ' : ''
         cls += y === 0 ? 'x-header ' : ''
         return cls
@@ -102,14 +102,16 @@ export default {
     },
     komaClicked (koma, pos, e) {
       if ( this.move.piece === '' ) { // koma is not selected.
-        this.move = {
-          from: pos,
-          to: {},
-          piece: koma.kind,
-          color: koma.color
+        if ( koma.color === this.turn ) { // turn check
+          this.move = {
+            from: pos,
+            to: {},
+            piece: koma.kind,
+            color: koma.color
+          }
+          this.selected = e.target
+          this.selected.classList.add('selected')
         }
-        this.selected = e.target
-        this.selected.classList.add('selected')
       } else { // koma is already selected.
         this.emitMove(pos)
       }
@@ -164,7 +166,7 @@ table.board {
       content: none;
     }
     &.hide {
-      display: none;
+      visibility: hidden;
     }
   }
   td.edge {

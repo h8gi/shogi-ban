@@ -6,7 +6,8 @@
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            :checked="checked"
            @move="runMove"
-           :class="'t'+turn"></board>
+           :class="'t'+turn"
+           :turn="turn"></board>
     {{moves}}
   </div>
 </template>

@@ -37,6 +37,19 @@ class Board {
     }
     this.put(move.to, srckoma)
   }
+
+  isValidMove (move) {
+    let srckoma = this.komaAt(move.from)
+    let dstkoma = this.komaAt(move.to)
+    if (srckoma.color !== move.color) { // 手番でない
+      return false
+    }
+    if (srckoma.color === dstkoma.color) { // 自駒同士
+      return false
+    }
+    return true
+  }
+  
   // 駒はそこにあるか
   isEmptyAt (pos) {
     return Koma.isEmpty(this.komaAt(pos))
@@ -134,22 +147,6 @@ export default {
   kansuji (i) {
     return '〇一二三四五六七八九'[i]
   },
-
-  // color: 手番
-  // board: 現在の盤
-  // from: 移動元のマス
-  // to: 移動先のマス
-  isValidMove (color, board, from, to) {
-    let srckoma = board.komaAt(from)
-    let dstkoma = board.komaAt(to)
-    if (srckoma.color !== color) { // 手番でない
-      return false
-    }
-    if (srckoma.color === dstkoma.color) { // 自駒同士
-      return false
-    }
-    return true
-  },  
   changeTurn (turn) {
     return turn === 0 ? 1 : 0
   }

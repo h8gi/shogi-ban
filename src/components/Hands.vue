@@ -37,7 +37,7 @@ export default {
 <style lang="scss">
 .h0 {
   &:before {
-    content: "先手▲:"
+    content: "先手▲"
   }
 }
 .h1 {

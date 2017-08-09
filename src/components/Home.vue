@@ -3,7 +3,10 @@
     <button @click="movetest">test</button>
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
-    <board :board-data="boardData" :reverse="reverse" :show-num="showNum"></board>
+    <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
+           :checked="checked"
+           :hands="[[],[]]"
+           @move="runMove"></board>
   </div>
 </template>
 
@@ -19,13 +22,19 @@ export default {
     return {
       boardData: syogi.boardPresets.HIRATE,
       reverse: false,
-      showNum: true
+      showNum: true,
+      checked: {valid: false, move: {}}
     }
   },
   methods: {
-    runMove (move) {
-      let koma = this.boardData.take(move.from)
-      this.boardData.put(move.to, koma)
+    runMove (move) {      
+      this.checked = {
+        valid: this.checkMove(move),
+        move: move
+      }
+    },
+    checkMove (move) {
+      return !(move.from.x === move.to.x && move.from.y === move.to.y)
     },
     movetest () {
       this.runMove({from: {x: 3, y: 3}, to: {x: 3, y: 4}})
@@ -35,7 +44,7 @@ export default {
     },
     toggleNum () {
       this.showNum = (!this.showNum)
-    }
+    },
   }
 }
 </script>

@@ -5,7 +5,7 @@
         <td v-for="x in (reverse ? jun : gyaku)" class="masu" :class="masuClass(x, y)"
             :data-x="x" :data-y="y"
             :data-x-label="x" :data-y-label="kansuji(y)"
-            @click="masuClicked({x: x, y: y}, $event)"
+            @click.self="masuClicked({x: x, y: y}, $event)"
             >
           <koma v-if="x !== 0 && y !== 0 && !boardData.isEmptyAt({x: x, y: y})"
                 :pos="{x: x, y: y}"
@@ -15,13 +15,11 @@
         </td>
       </tr>
     </table>
-    <p>
-      selected: {{ selectedKoma }}
-    </p>
+    move: {{ checked.move }}
     <!-- 先手 -->
-    <hands :turn="this.turn" color="0" :contents="hands[0]"></hands>
+    <hands color="0" :contents="hands[0]"></hands>
     <!-- 後手 -->
-    <hands :turn="this.turn" color="1" :contents="hands[1]"></hands>
+    <hands color="1" :contents="hands[1]"></hands>
   </div>
 </template>
 
@@ -39,12 +37,34 @@ export default {
     return {
       jun: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       gyaku: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
-      selectedKoma: syogi.Koma.empty(),
-      selectedMasu: {},
-      turn: 0
+      move: {
+        from: {},
+        to: {},
+        piece: '',
+        color: 0,
+      },
+      selected: null
     }
   },
-  props: ['boardData', 'reverse', 'showNum', 'hands'],
+  computed: {
+    koma () {
+      if ( this.move.piece === '' ) {
+        return syogi.Koma.empty()
+      }
+      return new syogi.Koma(this.move.color, this.move.piece)
+    },
+  },
+  props: ['boardData', 'reverse', 'showNum', 'hands', 'checked'],
+  watch: {
+    checked (val) {
+      if (val.valid) {
+        console.log('valid move!:', JSON.stringify(val.move) )
+        syogi.runMove(this.boardData, val.move)
+      } else {
+        console.log('invalid move!')        
+      }
+    }
+  },
   methods: {
     isHeader (x, y) {
       return x === 0 || y === 0
@@ -75,33 +95,41 @@ export default {
       }
     },
     masuClicked (pos, e) {
-      if ( syogi.Koma.isEmpty(this.selectedKoma) ) { // koma is not selected.
-        if ( !this.boardData.isEmptyAt(pos) ) { // there are koma at pos.
-          this.selectedKoma = this.boardData.komaAt(pos)
-          this.selectedMasu = pos
-          e.target.classList.add('selected')
-        }
+      if ( this.move.piece === '' ) { // koma is not selected.
+        // do nothing
       } else { // koma is already selected.
-        if ( this.boardData.isEmptyAt(pos) ) {
-          // remove koma from the old position.
-          this.boardData.take(this.selectedMasu)
-          
-          // put koma at the new position.
-          this.boardData.put(pos, this.selectedKoma)
-          
-          // clear the selected koma & masu.
-          this.selectedKoma = syogi.Koma.empty()
-          this.selectedMasu = {}
-          // the move is done.
-          this.turn = syogi.changeTurn(this.turn)
-        }
+        this.emitMove(pos)
       }
     },
-    komaClicked (contents, e) {
-      console.log(contents, e.target)
+    komaClicked (koma, pos, e) {
+      if ( this.move.piece === '' ) { // koma is not selected.
+        this.move = {
+          from: pos,
+          to: {},
+          piece: koma.kind,
+          color: koma.color
+        }
+        this.selected = e.target
+        this.selected.classList.add('selected')
+      } else { // koma is already selected.
+        this.emitMove(pos)
+      }
     },
-    hoge () {
-      console.log('hoge')
+    // clear the data 'move'
+    clearMove () {
+      this.move = {
+        from: {},
+        to: {},
+        piece: '',
+        color: 0        
+      },
+      this.selected.classList.remove('selected')
+      this.selected = null
+    },
+    emitMove (pos) {
+      this.move.to = pos            // set move
+      this.$emit('move', this.move) // emit move
+      this.clearMove()      
     },
     kansuji (i) {
       return syogi.kansuji(i)
@@ -153,6 +181,10 @@ table.board {
     &.bottom {
       border-bottom: solid 2px #000;
     }
+  }
+  td.selected {
+    color: #fff;
+    background: #000;
   }
 }
 </style>

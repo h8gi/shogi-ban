@@ -1,6 +1,6 @@
 <template>
   <div>
-    hands
+    hands: {{contents}}
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   name: 'hands',
   components: {
   },
-  props: [],
+  props: ['color', 'contents'],
   data () {
     return {    
     }

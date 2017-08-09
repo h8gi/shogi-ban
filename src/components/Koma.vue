@@ -1,7 +1,7 @@
 <template>
   <div class="koma"
        :class="className"
-       @click="click"
+       @click.self="click"
        >
     {{koma.kanji}}
   </div>
@@ -37,7 +37,7 @@ export default {
     validMove () {
     },
     click (e) {      
-      this.$emit('koma-clicked', this.contents, e)
+      this.$emit('koma-clicked', this.contents, this.pos, e)
     }
   }
 }
@@ -58,8 +58,9 @@ export default {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently */
-  
+
   cursor: pointer;
+  /* pointer-events: none; */
   width: 100%;
   height: 100%;
   font-size: 2.1em;

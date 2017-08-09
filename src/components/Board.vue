@@ -15,7 +15,6 @@
         </td>
       </tr>
     </table>
-    move: {{ checked.move }}
     <!-- 先手 -->
     <hands color="0" :contents="boardData.hands[0]"></hands>
     <!-- 後手 -->

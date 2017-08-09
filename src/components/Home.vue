@@ -6,6 +6,7 @@
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            :checked="checked"
            @move="runMove"></board>
+    {{turn}} <br/>
     {{moves}}
   </div>
 </template>
@@ -25,12 +26,14 @@ export default {
       showNum: true,
       checked: {valid: false, move: {}},
       moves: [{}],
+      turn: 0
     }
   },
   methods: {
     runMove (move) {
       let valid = this.checkMove(move)
       if (valid) {
+        this.toggleTurn()
         this.moves.push(move)
       }
       this.checked = {
@@ -38,7 +41,10 @@ export default {
         move: move
       }
     },
-    checkMove (move) {
+    checkMove (move) {      
+      if (move.color !== this.turn) {
+        return false
+      }
       return !(move.from.x === move.to.x && move.from.y === move.to.y)
     },
     movetest () {
@@ -50,6 +56,9 @@ export default {
     toggleNum () {
       this.showNum = (!this.showNum)
     },
+    toggleTurn () {
+      this.turn = this.turn === 0 ? 1 : 0
+    }
   }
 }
 </script>

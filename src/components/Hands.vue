@@ -2,7 +2,8 @@
   <div :class="'h'+color">
     <div v-for="(count, kind) in contents"
          v-if="count !== 0"
-         :class="'hands-'+kind" >
+         :class="'hands-'+kind"
+         @click="click(color, kind)">
       {{kanji(kind) + " " + count}}
     </div>
   </div>
@@ -24,6 +25,9 @@ export default {
   methods: {
     kanji (kind) {
       return syogi.Koma.kanji(kind)
+    },
+    click (color, kind) {
+      this.$emit('hands-clicked', new syogi.Koma(color, kind))
     }
   }
 }

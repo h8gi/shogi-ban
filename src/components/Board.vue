@@ -16,9 +16,11 @@
       </tr>
     </table>
     <!-- 先手 -->
-    <hands color="0" :contents="boardData.hands[0]"></hands>
+    <hands color="0" :contents="boardData.hands[0]"
+           @hands-clicked="handsClicked"></hands>
     <!-- 後手 -->
-    <hands color="1" :contents="boardData.hands[1]"></hands>
+    <hands color="1" :contents="boardData.hands[1]"
+           @hands-clicked="handsClicked"></hands>
   </div>
 </template>
 
@@ -57,10 +59,9 @@ export default {
   watch: {
     checked (val) {
       if (val.valid) {
-        console.log('valid move!:', JSON.stringify(val.move) )
         this.boardData.runMove(val.move)        
       } else {
-        console.log('invalid move!')        
+        console.log('invalid move!', val.move)
       }
     }
   },
@@ -115,6 +116,9 @@ export default {
       } else { // koma is already selected.
         this.emitMove(pos)
       }
+    },
+    handsClicked (koma) {
+      console.log('hands:', koma)
     },
     // clear the data 'move'
     clearMove () {

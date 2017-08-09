@@ -17,9 +17,9 @@
     </table>
     move: {{ checked.move }}
     <!-- 先手 -->
-    <hands color="0" :contents="hands[0]"></hands>
+    <hands color="0" :contents="boardData.hands[0]"></hands>
     <!-- 後手 -->
-    <hands color="1" :contents="hands[1]"></hands>
+    <hands color="1" :contents="boardData.hands[1]"></hands>
   </div>
 </template>
 
@@ -54,12 +54,12 @@ export default {
       return new syogi.Koma(this.move.color, this.move.piece)
     },
   },
-  props: ['boardData', 'reverse', 'showNum', 'hands', 'checked'],
+  props: ['boardData', 'reverse', 'showNum', 'checked'],
   watch: {
     checked (val) {
       if (val.valid) {
         console.log('valid move!:', JSON.stringify(val.move) )
-        syogi.runMove(this.boardData, val.move)
+        this.boardData.runMove(val.move)
       } else {
         console.log('invalid move!')        
       }
@@ -138,7 +138,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 table.board {
   border-collapse: collapse;
   text-align: center;

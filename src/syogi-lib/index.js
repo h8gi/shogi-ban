@@ -1,13 +1,14 @@
 // https://github.com/na2hiro/json-kifu-format
 class Board {
-  constructor (contents) {
+  constructor (contents, hands) {
     this.contents = contents
+    this.hands = hands
   }
   // get koma @ pos
-  // pos: {x: x, y: y}
+  // pos: {x: x, y: y} or {color: 0|1}
   // 1 <= x <= 9
   // 1 <= y <= 9
-  komaAt (pos) {    
+  komaAt (pos) {
     return this.contents[pos.x-1][pos.y-1]
   }
   // put koma at pos
@@ -19,6 +20,22 @@ class Board {
     let koma = this.komaAt(pos)
     this.put(pos, Koma.empty())
     return koma
+  }
+  addHands (koma) {
+    this.hands[koma.color][koma.kind] += 1
+  }
+  removeHands (koma) {
+    this.hands[koma.color][koma.kind] -= 1
+  }
+  
+  runMove (move) {
+    let srckoma = this.take(move.from)
+    if (!this.isEmptyAt(move.to)) {
+      let dstkoma = this.take(move.to)
+      dstkoma.color = srckoma.color
+      this.addHands(dstkoma)
+    }
+    this.put(move.to, srckoma)
   }
   // 駒はそこにあるか
   isEmptyAt (pos) {
@@ -32,23 +49,28 @@ class Board {
   static isValidPos (pos) {
     return 1 <= pos.x && pos.x <= 9 && 1 <= pos.y && pos.y <= 9
   }
+
+  static emptyHands () {
+    return [{FU: 0, KY: 0, KE: 0, GI: 0, KI: 0, KA: 0, HI: 0},
+            {FU: 0, KY: 0, KE: 0, GI: 0, KI: 0, KA: 0, HI: 0}]
+  }
 }
 
 const komaMap = {
-  FU: {kanji: '歩'},
-  KY: {kanji: '香'},
-  KE: {kanji: '桂'},
-  GI: {kanji: '銀'},
+  FU: {kanji: '歩', promote: 'TO'},
+  KY: {kanji: '香', promote: 'NY'},
+  KE: {kanji: '桂', promote: 'NK'},
+  GI: {kanji: '銀', promote: 'NG'},
   KI: {kanji: '金'},
-  KA: {kanji: '角'},
-  HI: {kanji: '飛'},
+  KA: {kanji: '角', promote: 'UM'},
+  HI: {kanji: '飛', promote: 'RY'},
   OU: {kanji: '玉'},
-  TO: {kanji: 'と'},
-  NY: {kanji: '杏'},
-  NK: {kanji: '圭'},
-  NG: {kanji: '全'},
-  UM: {kanji: '馬'},
-  RY: {kanji: '竜'}
+  TO: {kanji: 'と', demote: 'FU'},
+  NY: {kanji: '杏', demote: 'KY'},
+  NK: {kanji: '圭', demote: 'KE'},
+  NG: {kanji: '全', demote: 'GI'},
+  UM: {kanji: '馬', demote: 'KA'},
+  RY: {kanji: '竜', demote: 'HI'}
 }
 
 class Koma {
@@ -66,6 +88,18 @@ class Koma {
     return komaMap[this.kind].kanji
   }
 
+  // destructive!
+  promote () {
+    this.kind = komaMap[this.kind].promote
+  }
+  // destructive!
+  demote () {
+    this.kind = komaMap[this.kind].demote
+  }
+  // betray
+  betray () {
+    this.color = this.color === 0 ? 1 : 0
+  }
   static isEmpty (koma) {
     return Object.keys(koma).length === 0
   }
@@ -86,7 +120,7 @@ const boardPresets = {
     [{color:1, kind:'GI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'GI'}],
     [{color:1, kind:'KE'}, {color:1, 'kind':'HI'},{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {color:0, kind:'KA'}, {color:0, kind:'KE'}],
     [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}]
-  ])
+  ], Board.emptyHands())
 }
 
 export default {  
@@ -111,12 +145,7 @@ export default {
       return false
     }
     return true
-  },
-
-  runMove (board, move) {
-    let koma = board.take(move.from)
-    board.put(move.to, koma)
-  },
+  },  
   changeTurn (turn) {
     return turn === 0 ? 1 : 0
   }

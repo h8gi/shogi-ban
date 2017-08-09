@@ -1,6 +1,6 @@
 <template>
-  <div>
-    hands: {{contents}}
+  <div :class="'h'+color">
+    {{contents}}
   </div>
 </template>
 
@@ -23,5 +23,15 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
+<style lang="scss">
+.h0 {
+  &:before {
+    content: "先手▲:"
+  }
+}
+.h1 {
+  &:before {
+    content: "後手△"
+  }
+}
 </style>

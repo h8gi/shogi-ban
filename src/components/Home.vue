@@ -5,8 +5,8 @@
     <button @click="toggleNum">盤数字</button>
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            :checked="checked"
-           :hands="[[],[]]"
            @move="runMove"></board>
+    {{moves}}
   </div>
 </template>
 
@@ -23,13 +23,18 @@ export default {
       boardData: syogi.boardPresets.HIRATE,
       reverse: false,
       showNum: true,
-      checked: {valid: false, move: {}}
+      checked: {valid: false, move: {}},
+      moves: [{}],
     }
   },
   methods: {
-    runMove (move) {      
+    runMove (move) {
+      let valid = this.checkMove(move)
+      if (valid) {
+        this.moves.push(move)
+      }
       this.checked = {
-        valid: this.checkMove(move),
+        valid: valid,
         move: move
       }
     },

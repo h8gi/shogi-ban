@@ -13,7 +13,7 @@ export default {
   components: {
   },
   // contents is syogi.Koma.
-  props: ['contents', 'reverse', 'pos'],
+  props: ['contents', 'pos'],
   data () {
     return {    
     }
@@ -30,8 +30,8 @@ export default {
     }
   },
   methods: {
-    isReverse (color) {
-      return this.reverse ? color === 0 : color === 1
+    isReverse (color) {         // 後手は逆さま
+      return color === 1
     },    
     validMove () {
     },
@@ -59,9 +59,6 @@ export default {
   font-size: 2em;
   &.reverse {
     transform: rotate(180deg);  
-  }
-  
-  &.dragging {
   }  
 }
 

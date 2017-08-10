@@ -1,15 +1,15 @@
 <template>
-  <div class="board">
+  <div :class="'board ' + (reverse ? 'reverse' : '')">
     <table class="ban">
-      <tr v-for="y in (reverse ? gyaku : jun)">
-        <td v-for="x in (reverse ? jun : gyaku)" class="masu" :class="masuClass(x, y)"
+      <tr v-for="y in jun">
+        <td v-for="x in gyaku" class="masu" :class="masuClass(x, y)"
             :data-x="x" :data-y="y"
             :data-x-label="x" :data-y-label="kansuji(y)"
             @click.self="masuClicked({x: x, y: y}, $event)"
             >
           <koma v-if="x !== 0 && y !== 0 && !boardData.isEmptyAt({x: x, y: y})"
                 :pos="{x: x, y: y}"
-                :contents="boardData.komaAt({x: x, y: y})" :reverse="reverse"
+                :contents="boardData.komaAt({x: x, y: y})"
                 @koma-clicked="komaClicked">
           </koma>
         </td>
@@ -92,18 +92,11 @@ export default {
         cls += y === 0 ? 'x-header ' : ''
         return cls
       } else if (syogi.Board.isEdge({x: x, y: y})) {
-        let cls = 'edge '
-        if (this.reverse) {
-          cls += x === 9 ? 'right ' : ''
-          cls += x === 1 ? 'left ' : ''
-          cls += y === 9 ? 'top ' : ''
-          cls += y === 1 ? 'bottom ' : ''
-        } else {
-          cls += x === 1 ? 'right ' : ''
-          cls += x === 9 ? 'left ' : ''
-          cls += y === 1 ? 'top ' : ''
-          cls += y === 9 ? 'bottom ' : ''
-        }
+        let cls = 'edge '        
+        cls += x === 1 ? 'right ' : ''
+        cls += x === 9 ? 'left ' : ''
+        cls += y === 1 ? 'top ' : ''
+        cls += y === 9 ? 'bottom ' : ''
         return cls
       } else {
         return ''
@@ -175,6 +168,12 @@ export default {
 .board {
   text-align: center;
   position: relative;
+  &.reverse {
+    transform: rotate(180deg);  
+  }
+  .hands {
+    position: absolute;
+  }
 }
 
 table.ban {
@@ -192,10 +191,8 @@ table.ban {
     }
   }
   td.header {
-    border: 1px #fff solid;
-    background-color: #fff;
     &.x-header:before {
-      content: attr(data-x-label);
+      content: attr(data-x-label);      
     }
     &.y-header:before {
       content: attr(data-y-label);
@@ -205,6 +202,9 @@ table.ban {
     }
     &.hide {
       visibility: hidden;
+    }
+    .reverse & {
+      transform: rotate(180deg);
     }
   }
   td.edge {

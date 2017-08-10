@@ -76,7 +76,7 @@ export default {
       if (val.valid) {
         this.boardData.runMove(val.move)        
       } else {
-        console.log('invalid move!', val.move)
+        throw new Error('invalid move')
       }
     }
   },
@@ -126,7 +126,6 @@ export default {
       }
     },
     handsClicked (koma, e) {
-      console.log('hands:', koma)
       if ( this.move.piece === '' ) { // koma is not selected.
         if ( koma.color === this.turn ) { // turn check
           this.move = {
@@ -168,11 +167,23 @@ export default {
 .board {
   text-align: center;
   position: relative;
+  width: 960px;
+  margin: 0 auto;
   &.reverse {
     transform: rotate(180deg);  
   }
   .hands {
     position: absolute;
+    /* 先手 */
+    &.color-0 {
+      right: 100px;
+      bottom: 0px;
+    }
+    /* 後手 */
+    &.color-1 {
+      left: 50px;
+      top: 0px;
+    }
   }
 }
 

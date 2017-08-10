@@ -2,7 +2,7 @@
   <div class="koma"
        :class="className"
        @click.self="click">
-    {{koma.kanji}}
+    {{contents.kanji}}
   </div>
 </template>
 
@@ -24,9 +24,6 @@ export default {
       cls += this.clicked ? 'clicked ' : ''
       cls += this.isReverse(this.contents.color) ? 'reverse ' : ''
       return cls
-    },
-    koma () {
-      return new syogi.Koma(this.contents.color, this.contents.kind)
     }
   },
   methods: {
@@ -69,7 +66,6 @@ export default {
     background-color: #eee;
   }  
   &:hover {
-    background-color: #aaa;
   }
 }
 

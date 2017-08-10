@@ -41,11 +41,8 @@ export default {
         move: move
       }
     },
-    checkMove (move) {      
-      if (move.color !== this.turn) {
-        return false
-      }
-      return !(move.from.x === move.to.x && move.from.y === move.to.y)
+    checkMove (move) {
+      return this.boardData.isValidMove(move)
     },
     invert () {
       this.reverse = (!this.reverse)

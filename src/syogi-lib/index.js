@@ -1,14 +1,22 @@
 // https://github.com/na2hiro/json-kifu-format
 class Board {
   constructor (contents, hands) {
-    this.contents = contents
+    this.contents = contents.map(arr => {
+      return arr.map(pair => {
+        if (pair.kind === undefined) {
+          return Koma.empty()
+        } else {
+          return new Koma(pair.color, pair.kind)
+        }
+      })
+    })
     this.hands = hands
   }
   // get koma @ pos
   // pos: {x: x, y: y} or {color: 0|1}
   // 1 <= x <= 9
   // 1 <= y <= 9
-  komaAt (pos) {
+  komaAt (pos) {   
     return this.contents[pos.x-1][pos.y-1]
   }
   // put koma at pos
@@ -29,25 +37,41 @@ class Board {
   }
   
   runMove (move) {
-    let srckoma = this.take(move.from)
-    if (!this.isEmptyAt(move.to)) {
-      let dstkoma = this.take(move.to)
-      dstkoma.color = srckoma.color
-      this.addHands(dstkoma)
+    let koma = new Koma(move.color, move.piece)
+    if (move.from === undefined) { // 打つ
+      this.removeHands(koma)    // remove koma from `from` position.
+    } else {
+      this.take(move.from)      // remove koma from `from` position.
+      if (!this.isEmptyAt(move.to)) { // take koma from `to` position.
+        let dstkoma = this.take(move.to)  
+        dstkoma.color = koma.color
+        this.addHands(dstkoma)  // capture dstkoma
+      }
     }
-    this.put(move.to, srckoma)
+    this.put(move.to, koma)
   }
 
   isValidMove (move) {
-    let srckoma = this.komaAt(move.from)
-    let dstkoma = this.komaAt(move.to)
-    if (srckoma.color !== move.color) { // 手番でない
-      return false
+    if (move.from === undefined) { // 打つ
+      if (!this.isEmptyAt(move.to)) { // もう駒あるよ
+        return false
+      }
+      // 打てる!
+      return true
+    } else {                    // 普通に
+      let koma = this.komaAt(move.from)
+      if (this.isEmptyAt(move.to)) {
+        // 動かせる!
+        return true
+      } else {
+        let target = this.komaAt(move.to)
+        if (koma.color === target.color) { // 自駒
+          return false
+        }
+        // 動かせる!
+        return true
+      }
     }
-    if (srckoma.color === dstkoma.color) { // 自駒同士
-      return false
-    }
-    return true
   }
   
   // 駒はそこにあるか
@@ -109,7 +133,7 @@ class Koma {
   demote () {
     this.kind = komaMap[this.kind].demote
   }
-  // betray
+  // destructive! 
   betray () {
     this.color = this.color === 0 ? 1 : 0
   }
@@ -117,7 +141,7 @@ class Koma {
     return Object.keys(koma).length === 0
   }
 
-  static kanji (kind) {
+  static kind2kanji (kind) {
     return komaMap[kind].kanji
   }
 

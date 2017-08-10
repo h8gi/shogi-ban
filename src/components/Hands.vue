@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     kanji (kind) {
-      return syogi.Koma.kanji(kind)
+      return syogi.Koma.kind2kanji(kind)
     },
     click (color, kind, e) {
       this.$emit('hands-clicked', new syogi.Koma(color, kind), e)
@@ -37,7 +37,14 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>   
+<style lang="scss" scoped>
+.hands {  
+  border: 2px solid #aaa;
+  .reverse & {
+    transform: rotate(180deg);
+  }
+}
+
 li {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
@@ -47,8 +54,12 @@ li {
   user-select: none; /* Non-prefixed version, currently */
 
   list-style: none;
-  display: inline-block;
-  cursor: pointer;
+  cursor: default;
+  font-size: 1.2em;
+  &.selected {
+    background: #eee;
+    font-weight: bold;
+  }
 }
 .color-0 {
   &:before {
@@ -62,7 +73,10 @@ li {
 }
 
 .turn-0 .color-0, .turn-1 .color-1 {
-  font-weight: bold; 
+  border: 2px solid #000;
+  li {
+    cursor: pointer;
+  }
 }
 
 

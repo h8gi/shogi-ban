@@ -48,7 +48,6 @@ export default {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently */
-
   cursor: default;
   /* pointer-events: none; */
   width: 100%;

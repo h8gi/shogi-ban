@@ -28,6 +28,7 @@
 import syogi from '@/syogi-lib'
 import Koma from '@/components/Koma.vue'
 import Hands from '@/components/Hands.vue'
+import alertify from 'alertifyjs'
 export default {
   name: 'board',
   components: {
@@ -43,7 +44,7 @@ export default {
         to: {},
         piece: '',
         color: 0,
-      },
+      },      
       selected: null
     }
   },
@@ -74,7 +75,7 @@ export default {
   watch: {
     checked (val) {
       if (val.valid) {
-        this.boardData.runMove(val.move)        
+        this.boardData.runMove(val.move)
       } else {
         throw new Error('invalid move')
       }
@@ -85,22 +86,20 @@ export default {
       return x === 0 || y === 0
     },
     masuClass (x, y) {
+      let cls = ''
       if (this.isHeader(x, y)) {
-        let cls = 'header '
+        cls += 'header '
         cls += this.showNum ? '' : 'hide '
         cls += x === 0 ? 'y-header ' : ''
         cls += y === 0 ? 'x-header ' : ''
-        return cls
       } else if (syogi.Board.isEdge({x: x, y: y})) {
-        let cls = 'edge '        
+        cls += 'edge '        
         cls += x === 1 ? 'right ' : ''
         cls += x === 9 ? 'left ' : ''
         cls += y === 1 ? 'top ' : ''
-        cls += y === 9 ? 'bottom ' : ''
-        return cls
-      } else {
-        return ''
+        cls += y === 9 ? 'bottom ' : ''        
       }
+      return cls
     },
     masuClicked (pos, e) {
       if ( this.move.piece === '' ) { // koma is not selected.
@@ -109,37 +108,35 @@ export default {
         this.emitMove(pos)
       }
     },
-    komaClicked (koma, pos, e) {
+    komaClicked (koma, pos, e) {      
       if ( this.move.piece === '' ) { // koma is not selected.
         if ( koma.color === this.turn ) { // turn check
-          this.move = {
-            from: pos,
-            to: {},
-            piece: koma.kind,
-            color: koma.color
-          }
-          this.selected = e.target
-          this.selected.classList.add('selected')
+          this.startMove(koma, pos, e)
         }
       } else { // koma is already selected.
-        this.emitMove(pos)
+        if (koma.color === this.move.color) { // 自駒
+          this.startMove(koma, pos, e)
+        } else {                // 駒をとる
+          this.move.capture = koma.kind
+          this.emitMove(pos)
+        }
       }
     },
     handsClicked (koma, e) {
-      if ( this.move.piece === '' ) { // koma is not selected.
-        if ( koma.color === this.turn ) { // turn check
-          this.move = {
-            to: {},
-            piece: koma.kind,
-            color: koma.color
-          }
-          this.selected = e.target
-          this.selected.classList.add('selected')
-        }
-      } else { // koma is already selected
-        // do nothing
-        this.clearMove()
+      if ( koma.color === this.turn ) { // turn check
+        this.startMove(koma, undefined, e)
       }
+    },
+    startMove (koma, pos, e) {
+      this.clearMove()
+      this.move = {
+        from: pos,
+        to: {},
+        piece: koma.kind,
+        color: koma.color
+      }
+      this.selected = e.target
+      this.selected.classList.add('selected')
     },
     // clear the data 'move'
     clearMove () {
@@ -148,17 +145,44 @@ export default {
         to: {},
         piece: '',
         color: 0        
-      },
-      this.selected.classList.remove('selected')
-      this.selected = null
+      }
+      if (this.selected) {
+        this.selected.classList.remove('selected')
+        this.selected = null
+      }      
     },
     emitMove (pos) {
       this.move.to = pos            // set move
-      this.$emit('move', this.move) // emit move
-      this.clearMove()      
+      if (this.koma.isPromotableAt(pos)) {
+        this.askPromote()
+      } else {
+        this.$emit('move', this.move) // emit move
+        this.clearMove()
+      }      
+    },
+    askPromote () {                  
+      alertify
+        .confirm('成りますか？', () => {
+          // yes
+          this.move.promote = true
+          this.$emit('move', this.move)
+          this.clearMove()
+        }, () => {
+          // no
+          this.move.promote = false
+          this.$emit('move', this.move)
+          this.clearMove()
+        }).set({
+          closable: false,
+          transition: 'fade',
+          labels: {ok: 'はい', cancel: 'いいえ'},
+          movable: false
+        }).setHeader(' ')
     },
     kansuji (i) {
       return syogi.kansuji(i)
+    },
+    getKomaAt (pos) {
     }
   }
 }
@@ -177,12 +201,12 @@ export default {
     position: absolute;
     /* 先手 */
     &.color-0 {
-      right: 100px;
+      right: 80px;
       bottom: 0px;
     }
     /* 後手 */
     &.color-1 {
-      left: 50px;
+      left: 80px;
       top: 0px;
     }
   }
@@ -191,10 +215,11 @@ export default {
 table.ban {
   border-collapse: collapse;
   text-align: center;
-  margin: 0 auto;
+  margin: 0 auto;  
+
   td {
     width: 50px;
-    height: 50px;
+    height: 50px;    
   }
   td:not(.header) {
     border: 1px #000 solid;
@@ -203,6 +228,8 @@ table.ban {
     }
   }
   td.header {
+    width: 20px;
+    height: 20px;
     &.x-header:before {
       content: attr(data-x-label);      
     }

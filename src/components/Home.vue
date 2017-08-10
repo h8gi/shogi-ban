@@ -7,17 +7,19 @@
            @move="runMove"
            :class="'turn-'+turn"
            :turn="turn"></board>
-    {{moves}}
+    <moves :contents="moves"></moves>
   </div>
 </template>
 
 <script>
 import Board from '@/components/Board'
+import Moves from '@/components/Moves'
 import syogi from '@/syogi-lib'
 export default {
   name: 'home',
   components: {
-    Board
+    Board,
+    Moves
   },
   data () {
     return {

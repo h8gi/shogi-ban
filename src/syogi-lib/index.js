@@ -77,7 +77,7 @@ const komaMap = {
   KI: {kanji: '金'},
   KA: {kanji: '角', promote: 'UM'},
   HI: {kanji: '飛', promote: 'RY'},
-  OU: {kanji: '玉'},
+  OU: {kanji: '王'},
   TO: {kanji: 'と', demote: 'FU'},
   NY: {kanji: '杏', demote: 'KY'},
   NK: {kanji: '圭', demote: 'KE'},

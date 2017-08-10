@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     className () {
-      let cls = 'k' + this.contents.color + ' '
+      let cls = 'color-' + this.contents.color + ' '
       cls += this.clicked ? 'clicked ' : ''
       cls += this.isReverse(this.contents.color) ? 'reverse ' : ''
       return cls
@@ -45,21 +45,35 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .koma {
-  cursor: pointer;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently */
+
+  cursor: default;
+  /* pointer-events: none; */
   width: 100%;
   height: 100%;
   font-size: 2em;
   &.reverse {
     transform: rotate(180deg);  
   }
-
+  
   &.dragging {
   }  
 }
 
-.t0 .k0.selected, .t1 .k1.selected {
-  font-weight: bold;
-  background-color: #eee;
+.turn-0 .color-0, .turn-1 .color-1{
+  cursor: pointer;
+  &.selected {
+    font-weight: bold;
+    background-color: #eee;
+  }  
+  &:hover {
+    background-color: #aaa;
+  }
 }
 
 </style>

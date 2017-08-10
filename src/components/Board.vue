@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <table class="board">
+  <div class="board">
+    <table class="ban">
       <tr v-for="y in (reverse ? gyaku : jun)">
         <td v-for="x in (reverse ? jun : gyaku)" class="masu" :class="masuClass(x, y)"
             :data-x="x" :data-y="y"
@@ -16,10 +16,10 @@
       </tr>
     </table>
     <!-- 先手 -->
-    <hands color="0" :contents="boardData.hands[0]"
+    <hands :color="0" :contents="boardData.hands[0]"
            @hands-clicked="handsClicked"></hands>
     <!-- 後手 -->
-    <hands color="1" :contents="boardData.hands[1]"
+    <hands :color="1" :contents="boardData.hands[1]"
            @hands-clicked="handsClicked"></hands>
   </div>
 </template>
@@ -55,7 +55,22 @@ export default {
       return new syogi.Koma(this.move.color, this.move.piece)
     },
   },
-  props: ['boardData', 'reverse', 'showNum', 'checked', 'turn'],
+  props: {
+    boardData: syogi.Board,
+    reverse: {
+      type: Boolean,
+      default: false
+    },
+    showNum: {
+      type: Boolean,
+      default: true
+    },
+    checked: Object,
+    turn: {
+      type: Number,
+      default: 0
+    }
+  },
   watch: {
     checked (val) {
       if (val.valid) {
@@ -117,8 +132,21 @@ export default {
         this.emitMove(pos)
       }
     },
-    handsClicked (koma) {
+    handsClicked (koma, e) {
       console.log('hands:', koma)
+      if ( this.move.piece === '' ) { // koma is not selected.
+        if ( koma.color === this.turn ) { // turn check
+          this.move = {
+            to: {},
+            piece: koma.kind,
+            color: koma.color
+          }
+          this.selected = e.target
+          this.selected.classList.add('selected')
+        }
+      } else { // koma is already selected
+        // do nothing
+      }
     },
     // clear the data 'move'
     clearMove () {
@@ -144,9 +172,15 @@ export default {
 </script>
 
 <style lang="scss">
-table.board {
+.board {
+  text-align: center;
+  position: relative;
+}
+
+table.ban {
   border-collapse: collapse;
   text-align: center;
+  margin: 0 auto;
   td {
     width: 50px;
     height: 50px;
@@ -188,10 +222,5 @@ table.board {
     }
   }
 }
-.t0 {
-  .h0 { font-weight: bold; }
-}
-.t1 {
-  .h1 { font-weight: bold; }
-}
+
 </style>

@@ -5,7 +5,7 @@
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            :checked="checked"
            @move="runMove"
-           :class="'t'+turn"
+           :class="'turn-'+turn"
            :turn="turn"></board>
     {{moves}}
   </div>
@@ -62,5 +62,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-
+.home {
+}
 </style>

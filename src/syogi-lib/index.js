@@ -30,7 +30,11 @@ class Board {
     return koma
   }
   addHands (koma) {
-    this.hands[koma.color][koma.kind] += 1
+    let kind = koma.kind
+    if (koma.isPromoted()) {
+      kind = koma.demote().kind
+    }
+    this.hands[koma.color][kind] += 1
   }
   removeHands (koma) {
     this.hands[koma.color][koma.kind] -= 1
@@ -47,6 +51,9 @@ class Board {
         dstkoma.color = koma.color
         this.addHands(dstkoma)  // capture dstkoma
       }
+    }
+    if (move.promote) {
+      koma = koma.promote()
     }
     this.put(move.to, koma)
   }
@@ -124,15 +131,30 @@ class Koma {
   get kanji () {
     return komaMap[this.kind].kanji
   }
-
-  // destructive!
   promote () {
-    this.kind = komaMap[this.kind].promote
+    return new Koma(this.color, komaMap[this.kind].promote)
   }
-  // destructive!
   demote () {
-    this.kind = komaMap[this.kind].demote
+    return new Koma(this.color, komaMap[this.kind].demote)
   }
+  // Can I promote at the pos?
+  isPromotableAt (pos) {
+    // そもそも成れない駒
+    if (komaMap[this.kind].promote === undefined) {
+      return false
+    }
+    // 先手
+    if (this.color === 0) {
+      return 1 <= pos.y && pos.y <= 3
+    }
+    // 後手
+    return 7 <= pos.y && pos.y <= 9
+  }
+  // 成ってる
+  isPromoted () {  
+    return ['TO', 'NY', 'NK', 'NG', 'UM', 'RY'].includes(this.kind)
+  }
+
   // destructive! 
   betray () {
     this.color = this.color === 0 ? 1 : 0

@@ -138,6 +138,7 @@ export default {
         }
       } else { // koma is already selected
         // do nothing
+        this.clearMove()
       }
     },
     // clear the data 'move'

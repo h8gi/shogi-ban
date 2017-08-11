@@ -13,7 +13,7 @@
           </koma>
         </td>
       </tr>
-    </table>
+    </table>    
     <!-- 先手 -->
     <hands :color="0" :turn="turn" :contents="boardData.hands[0]"
            @hands-clicked="handsClicked"></hands>
@@ -233,6 +233,7 @@ table.ban {
   td.header {
     width: 20px;
     height: 20px;
+    pointer-events: none;
     &.x-header:before {
       content: attr(data-x-label);      
     }

@@ -3,23 +3,22 @@
     <table class="ban">
       <tr v-for="y in jun">
         <td v-for="x in gyaku" class="masu" :class="masuClass(x, y)"
-            :data-x="x" :data-y="y"
             :data-x-label="x" :data-y-label="kansuji(y)"
-            @click.self="masuClicked({x: x, y: y}, $event)"
-            >
+            @click.self="masuClicked({x: x, y: y}, $event)">
           <koma v-if="x !== 0 && y !== 0 && !boardData.isEmptyAt({x: x, y: y})"
                 :pos="{x: x, y: y}"
                 :contents="boardData.komaAt({x: x, y: y})"
+                :class="latestMove !== null && latestMove.to.x === x && latestMove.to.y === y ? 'latest-move' : ''"
                 @koma-clicked="komaClicked">
           </koma>
         </td>
       </tr>
     </table>
     <!-- 先手 -->
-    <hands :color="0" :contents="boardData.hands[0]"
+    <hands :color="0" :turn="turn" :contents="boardData.hands[0]"
            @hands-clicked="handsClicked"></hands>
     <!-- 後手 -->
-    <hands :color="1" :contents="boardData.hands[1]"
+    <hands :color="1" :turn="turn" :contents="boardData.hands[1]"
            @hands-clicked="handsClicked"></hands>
   </div>
 </template>
@@ -66,20 +65,16 @@ export default {
       type: Boolean,
       default: true
     },
-    checked: Object,
     turn: {
       type: Number,
       default: 0
+    },
+    latestMove: {
+      type: Object,
+      default: null
     }
   },
   watch: {
-    checked (val) {
-      if (val.valid) {
-        this.boardData.runMove(val.move)
-      } else {
-        throw new Error('invalid move')
-      }
-    }
   },
   methods: {
     isHeader (x, y) {
@@ -89,7 +84,7 @@ export default {
       let cls = ''
       if (this.isHeader(x, y)) {
         cls += 'header '
-        cls += this.showNum ? '' : 'hide '
+        cls += this.showNum ? '' : 'hide '        
         cls += x === 0 ? 'y-header ' : ''
         cls += y === 0 ? 'x-header ' : ''
       } else if (syogi.Board.isEdge({x: x, y: y})) {
@@ -99,6 +94,7 @@ export default {
         cls += y === 1 ? 'top ' : ''
         cls += y === 9 ? 'bottom ' : ''        
       }
+      cls += this.latestMove !== null && this.latestMove.to.x === x && this.latestMove.to.y === y ? 'latest-move' : ''
       return cls
     },
     masuClicked (pos, e) {
@@ -150,15 +146,22 @@ export default {
         this.selected.classList.remove('selected')
         this.selected = null
       }      
-    },
+    },    
     emitMove (pos) {
-      this.move.to = pos            // set move
-      if (this.koma.isPromotableAt(pos)) {
-        this.askPromote()
+      this.move.to = pos        // set move
+      if (this.checkMove(this.move)) {        
+        if (this.koma.isPromotableAt(pos)) {
+          this.askPromote()
+        } else {
+          this.$emit('move', this.move) // emit move
+          this.clearMove()
+        }
       } else {
-        this.$emit('move', this.move) // emit move
         this.clearMove()
-      }      
+      }
+    },
+    checkMove (move) {
+      return this.boardData.isValidMove(move)
     },
     askPromote () {                  
       alertify
@@ -201,12 +204,12 @@ export default {
     position: absolute;
     /* 先手 */
     &.color-0 {
-      right: 80px;
+      right: 100px;
       bottom: 0px;
     }
     /* 後手 */
     &.color-1 {
-      left: 80px;
+      left: 100px;
       top: 0px;
     }
   }
@@ -215,16 +218,16 @@ export default {
 table.ban {
   border-collapse: collapse;
   text-align: center;
-  margin: 0 auto;  
-
+  margin: 0 auto;
   td {
     width: 50px;
-    height: 50px;    
+    height: 50px;
   }
   td:not(.header) {
     border: 1px #000 solid;
-    &.over, &.over1 {
-      background: #eee;
+    &.latest-move {    
+      background: #000;
+      color: #fff;
     }
   }
   td.header {

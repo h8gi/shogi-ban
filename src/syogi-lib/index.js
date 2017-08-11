@@ -18,7 +18,7 @@ class Board {
   // 1 <= y <= 9
   komaAt (pos) {   
     return this.contents[pos.x-1][pos.y-1]
-  }
+  }  
   // put koma at pos
   put (pos, koma) {
     this.contents[pos.x-1].splice(pos.y-1, 1, koma)

@@ -1,12 +1,17 @@
 <template>
-  <ul :class="'hands color-'+color">
-    <li v-for="(count, kind) in contents"
-        v-if="count !== 0"
-        :class="'hands-'+kind"
-        @click="click(color, kind, $event)">
-      {{kanji(kind) + " " + count}}
-    </li>
-  </ul>
+  <div :class="'hands color-'+color">
+    <span id="teban" :class="color === turn ? 'visible' : 'hidden'">
+      手番
+    </span>
+    <ul>
+      <li v-for="(count, kind) in contents"
+          v-if="count !== 0"
+          :class="'hands-'+kind"
+          @click="click(color, kind, $event)">      
+        {{kanji(kind) + " " + count}}
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
@@ -17,7 +22,8 @@ export default {
   },
   props: {
     color: Number,
-    contents: Object
+    turn: Number,
+    contents: Object,
   },
   data () {
     return {    
@@ -39,12 +45,30 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .hands {  
-  border: 2px solid #666;
-  color: #666;
-  padding: 0;
-  height: 240px;
+  margin-top: 22px;
+  margin-bottom: 0px;
+
+  ul {
+    border: 2px solid #666;
+    color: #666;
+    width: 105px;
+    height: 240px;
+    padding: 0;
+    margin: 0;
+  }
   .reverse & {
     transform: rotate(180deg);
+    margin-top: 0px;
+    margin-bottom: 22px;
+  }
+
+  #teban {
+    &.visible {
+      visibility: visible;
+    }
+    &.hidden {
+      visibility: hidden;
+    }
   }
 }
 
@@ -68,13 +92,13 @@ li {
 }
 
 
-.color-0 {
+.color-0 ul{
   &:before {
     content: "先手▲:";
     padding: 3px 40px 3px 5px;
   }
 }
-.color-1 {
+.color-1 ul{
   &:before {
     content: "後手△:";
     padding: 3px 40px 3px 5px;
@@ -82,8 +106,10 @@ li {
 }
 
 .turn-0 .color-0, .turn-1 .color-1 {
-  border: 2px solid #000;
-  color: #000;
+  ul {
+    border: 2px solid #000;
+    color: #000;
+  }  
   li {
     cursor: pointer;
   }

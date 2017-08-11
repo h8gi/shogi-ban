@@ -55,7 +55,7 @@ export default {
   font-size: 2em;
   &.reverse {
     transform: rotate(180deg);  
-  }  
+  }
 }
 
 .turn-0 .color-0, .turn-1 .color-1{

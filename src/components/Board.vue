@@ -38,12 +38,12 @@ export default {
     return {
       jun: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       gyaku: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
-      move: {
+      move: new syogi.Move({
         from: {},
         to: {},
         piece: '',
         color: 0,
-      },      
+      }),
       selected: null
     }
   },
@@ -125,23 +125,23 @@ export default {
     },
     startMove (koma, pos, e) {
       this.clearMove()
-      this.move = {
+      this.move = new syogi.Move({
         from: pos,
         to: {},
         piece: koma.kind,
         color: koma.color
-      }
+      })
       this.selected = e.target
       this.selected.classList.add('selected')
     },
     // clear the data 'move'
     clearMove () {
-      this.move = {
+      this.move = new syogi.Move({
         from: {},
         to: {},
         piece: '',
         color: 0        
-      }
+      })
       if (this.selected) {
         this.selected.classList.remove('selected')
         this.selected = null
@@ -150,7 +150,7 @@ export default {
     emitMove (pos) {
       this.move.to = pos        // set move
       if (this.checkMove(this.move)) {        
-        if (this.koma.isPromotableAt(pos)) {
+        if (!this.move.isDrop() && this.koma.isPromotableAt(pos)) {
           this.askPromote()
         } else {
           this.$emit('move', this.move) // emit move
@@ -192,11 +192,11 @@ export default {
 </script>
 
 <style lang="scss">
+@import '../assets/scss/common.scss';
 .board {
   text-align: center;
   position: relative;
-  width: 960px;
-  margin: 0 auto;
+  @include wide;
   &.reverse {
     transform: rotate(180deg);  
   }
@@ -224,7 +224,7 @@ table.ban {
     height: 50px;
   }
   td:not(.header) {
-    border: 1px #000 solid;
+    border: 2px #000 solid;
     &.latest-move {    
       background: #000;
       color: #fff;
@@ -250,18 +250,18 @@ table.ban {
       transform: rotate(180deg);
     }
   }
-  td.edge {
+  td.edge {    
     &.right {
-      border-right: solid 2px #000;
+      border-right: solid 4px #000;
     }
     &.left {
-      border-left: solid 2px #000;
+      border-left: solid 4px #000;
     }
     &.top {
-      border-top: solid 2px #000;
+      border-top: solid 4px #000;
     }
     &.bottom {
-      border-bottom: solid 2px #000;
+      border-bottom: solid 4px #000;
     }
   }
 }

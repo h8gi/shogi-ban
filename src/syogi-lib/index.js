@@ -1,3 +1,4 @@
+import _ from 'lodash'
 // https://github.com/na2hiro/json-kifu-format
 class Board {
   constructor (contents, hands) {
@@ -42,14 +43,16 @@ class Board {
   
   runMove (move) {
     let koma = new Koma(move.color, move.piece)
-    if (move.from === undefined) { // 打つ
+    if (move.isDrop()) { // 打つ
       this.removeHands(koma)    // remove koma from `from` position.
     } else {
       this.take(move.from)      // remove koma from `from` position.
       if (!this.isEmptyAt(move.to)) { // take koma from `to` position.
-        let dstkoma = this.take(move.to)  
-        dstkoma.color = koma.color
-        this.addHands(dstkoma)  // capture dstkoma
+        let target = this.take(move.to)  
+        target.color = koma.color
+        if (target.kind !== 'OU') {
+          this.addHands(target)  // capture target
+        }
       }
     }
     if (move.promote) {
@@ -57,20 +60,36 @@ class Board {
     }
     this.put(move.to, koma)
   }
+  // 逆
+  revMove (move) {
+    let koma = this.take(move.to)  // remove koma from `to` position.
+    if (move.isDrop()) { // 打つ     
+      this.addHands(koma)          // return koma to hands.
+    } else {
+      if (move.capture !== undefined) { // capture
+        let captured = new Koma(changeTurn(koma.color), move.capture)
+        this.put(move.to, captured)
+      }
+      if (move.promote) {
+        koma = koma.demote()
+      }
+      this.put(move.from, koma)
+    }
+  }
 
   isValidMove (move) {
-    if (move.from === undefined) { // 打つ
+    if (move.isDrop()) { // 打つ
       if (!this.isEmptyAt(move.to)) { // もう駒あるよ
         return false
       }
       // 打てる!
       return true
     } else {                    // 普通に
-      let koma = this.komaAt(move.from)
-      if (this.isEmptyAt(move.to)) {
+      let koma = this.komaAt(move.from)       
+      if (this.isEmptyAt(move.to)) { // 行き先空
         // 動かせる!
         return true
-      } else {
+      } else {                  // 行き先に駒
         let target = this.komaAt(move.to)
         if (koma.color === target.color) { // 自駒
           return false
@@ -80,7 +99,7 @@ class Board {
       }
     }
   }
-  
+
   // 駒はそこにあるか
   isEmptyAt (pos) {
     return Koma.isEmpty(this.komaAt(pos))
@@ -100,21 +119,84 @@ class Board {
   }
 }
 
+
+
 const komaMap = {
-  FU: {kanji: '歩', promote: 'TO'},
-  KY: {kanji: '香', promote: 'NY'},
-  KE: {kanji: '桂', promote: 'NK'},
-  GI: {kanji: '銀', promote: 'NG'},
-  KI: {kanji: '金'},
-  KA: {kanji: '角', promote: 'UM'},
-  HI: {kanji: '飛', promote: 'RY'},
-  OU: {kanji: '王'},
-  TO: {kanji: 'と', demote: 'FU'},
-  NY: {kanji: '杏', demote: 'KY'},
-  NK: {kanji: '圭', demote: 'KE'},
-  NG: {kanji: '全', demote: 'GI'},
-  UM: {kanji: '馬', demote: 'KA'},
-  RY: {kanji: '竜', demote: 'HI'}
+  FU: {
+    kanji: '歩',
+    promote: 'TO',
+    togo (color, pos) {
+      let {x, y} = pos
+      y = color === 0 ? (y-1) : (y+1)
+      return [{x: x, y: y}]
+    }
+  },
+  KY: {
+    kanji: '香',
+    promote: 'NY',
+    togo (color, pos) {
+      let {x, y} = pos
+      let yarr = color === 0 ? _.range(y-1, 0) : _.range(y+1, 10)
+      return yarr.map(y => {
+        return {x: x, y: y}
+      })
+    }
+  },
+  KE: {
+    kanji: '桂',
+    promote: 'NK',
+    togo (color, pos) {
+      let {x, y} = pos
+      return [x+1, x-1].map(x => {
+        return {x: x, y: color === 0 ? y-2 : y+2}
+      })   
+    }
+  },
+  GI: {
+    kanji: '銀',
+    promote: 'NG',
+    togo (color, pos) {
+      
+    }
+  },
+  KI: {
+    kanji: '金'
+  },
+  KA: {
+    kanji: '角',
+    promote: 'UM'
+  },
+  HI: {
+    kanji: '飛',
+    promote: 'RY'
+  },
+  OU: {
+    kanji: '王'
+  },
+  TO: {
+    kanji: 'と',
+    demote: 'FU'
+  },
+  NY: {
+    kanji: '杏',
+    demote: 'KY'
+  },
+  NK: {
+    kanji: '圭',
+    demote: 'KE'
+  },
+  NG: {
+    kanji: '全',
+    demote: 'GI'
+  },
+  UM: {
+    kanji: '馬',
+    demote: 'KA'
+  },
+  RY: {
+    kanji: '竜',
+    demote: 'HI'
+  }
 }
 
 class Koma {
@@ -154,7 +236,9 @@ class Koma {
   isPromoted () {  
     return ['TO', 'NY', 'NK', 'NG', 'UM', 'RY'].includes(this.kind)
   }
-
+  movablePosArray (from) {
+    return komaMap[this.kind].togo(this.color, from)    
+  }
   // destructive! 
   betray () {
     this.color = this.color === 0 ? 1 : 0
@@ -169,6 +253,20 @@ class Koma {
 
   static empty () {
     return {}
+  }
+}
+
+class Move {
+  constructor (params) {
+    Object.assign(this, params)
+  }
+
+  isDrop () {
+    return this.from === undefined
+  }
+
+  direction () {
+    
   }
 }
 
@@ -190,6 +288,7 @@ export default {
   boardPresets,
   Board,
   Koma,
+  Move,
   kansuji (i) {
     return '〇一二三四五六七八九'[i]
   },

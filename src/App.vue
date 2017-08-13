@@ -17,6 +17,7 @@ export default {
   -webkit-transition-duration: 80ms;
   transition-duration: 80ms;
 }
+
 #app {
 }
 </style>

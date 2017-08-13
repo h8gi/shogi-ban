@@ -1,7 +1,7 @@
 <template>
   <div :class="'hands color-'+color">
     <span id="teban" :class="color === turn ? 'visible' : 'hidden'">
-      手番
+      &lt;手番&gt;
     </span>
     <ul>
       <li v-for="(count, kind) in contents"
@@ -44,12 +44,13 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+@import '../assets/scss/common.scss';
 .hands {  
   margin-top: 22px;
   margin-bottom: 0px;
 
   ul {
-    border: 2px solid #666;
+    border: 3px solid #666;
     color: #666;
     width: 105px;
     height: 240px;
@@ -63,6 +64,7 @@ export default {
   }
 
   #teban {
+    font-weight: bold;
     &.visible {
       visibility: visible;
     }
@@ -73,13 +75,7 @@ export default {
 }
 
 li {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently */
-
+  @include no-select;
   list-style: none;
   cursor: default;
   font-size: 1.2em;
@@ -94,20 +90,31 @@ li {
 
 .color-0 ul{
   &:before {
-    content: "先手▲:";
-    padding: 3px 40px 3px 5px;
+    content: "先手☗";    
+    display: inline-block;
+    width: 100%;
+    border-bottom: 2px solid #000;
+    .turn-1 & {
+      border-bottom: 2px solid #666;
+    }
   }
 }
 .color-1 ul{
   &:before {
-    content: "後手△:";
-    padding: 3px 40px 3px 5px;
+    content: "後手☖";
+    display: inline-block;
+    width: 100%;
+    border-bottom: 2px solid #000;
+    .turn-0 & {
+      border-bottom: 2px solid #666;
+    }
   }
+  
 }
 
 .turn-0 .color-0, .turn-1 .color-1 {
   ul {
-    border: 2px solid #000;
+    border: 3px solid #000;
     color: #000;
   }  
   li {

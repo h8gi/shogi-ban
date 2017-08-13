@@ -2,6 +2,7 @@
   <div class="home">
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
+    <button @click="toggleSounds">{{ sounds ? "音量OFF" : "音量ON"}}</button>
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            @move="handleMove"
            :class="'turn-'+turn"
@@ -28,7 +29,9 @@ export default {
       showNum: true,
       moves: [{}],
       turn: 0,
-      latestMove: null
+      latestMove: null,
+      sounds: true,
+      komaoto: new Audio(require('@/assets/mp3/komaoto.mp3')) // https://on-jin.com
     }
   },
   methods: {
@@ -37,6 +40,12 @@ export default {
       this.moves.push(move)
       this.boardData.runMove(move)
       this.latestMove = move
+      if (this.sounds) {
+        if (this.komaoto.currentTime) {
+          this.komaoto.currentTime = 0
+        }
+        this.komaoto.play()
+      }      
     },
     invert () {
       this.reverse = (!this.reverse)
@@ -46,6 +55,9 @@ export default {
     },
     toggleTurn () {
       this.turn = this.turn === 0 ? 1 : 0
+    },
+    toggleSounds () {
+      this.sounds = !this.sounds
     }
   }
 }

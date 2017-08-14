@@ -9,7 +9,9 @@
            :class="'turn-'+turn"
            :turn="turn"
            :latest-move="latestMove"></board>
-    <move-list :contents="moves"></move-list>
+    <move-list :contents="moves"
+               @back="handleBack"
+               @forward="handleForward"></move-list>
   </div>
 </template>
 
@@ -29,6 +31,7 @@ export default {
       reverse: false,
       showNum: true,
       moves: [],
+      currentPos: -1,
       turn: 0,
       sounds: true,
       komaoto: new Audio(require('@/assets/mp3/komaoto.mp3')) // https://on-jin.com
@@ -40,6 +43,10 @@ export default {
     }
   },
   methods: {
+    handleForward () {      
+    },
+    handleBack () {
+    },
     handleMove (move, elem) {
       this.toggleTurn()
       this.moves.push(move)
@@ -80,6 +87,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+@import '../assets/scss/common.scss';
 .home {
+  @include wide;
 }
 </style>

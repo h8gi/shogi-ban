@@ -68,8 +68,10 @@ class Board {
       this.addHands(koma)       // return koma to hands.
     } else {
       if (move.capture !== undefined) { // capture
-        let captured = new Koma(koma.color, move.capture)        
-        this.removeHands(captured.isPromoted() ? captured.demote() : captured)
+        let captured = new Koma(koma.color, move.capture)
+        if (captured.kind !== 'OU') {
+          this.removeHands(captured.isPromoted() ? captured.demote() : captured)
+        }        
         this.put(move.to, captured.betray())
       }
       this.put(move.from, koma)
@@ -140,10 +142,10 @@ class Board {
       })
     default:
       // 斜め
-      let yrange = /D/.test(move.info.direction) ? _.range(move.from.y+1, move.to.y) : _.range(move.to.y+1, move.from.y)
-      let xrange = /L/.test(move.info.direction) ? _.range(move.from.x+1, move.to.x) : _.range(move.to.x+1, move.from.x)
-      return yrange.map((y, i) => {
-        return {x: xrange[i], y: y}
+      let xrange = _.range(move.from.x+(/L/.test(move.info.direction)?1:-1), move.to.x)
+      let yrange = _.range(move.from.y+(/D/.test(move.info.direction)?1:-1), move.to.y)      
+      return _.zipWith(xrange, yrange, (x, y) => {
+        return {x: x, y: y}
       }).every(pos => {
         return this.isEmptyAt(pos)
       })
@@ -435,6 +437,34 @@ class Move {
   }
 }
 
+class MoveList {
+  constructor (array) {
+    this.contents = array
+    this.index = -1
+  }
+  push (move) {
+    this.contents.push(move)
+    this.index += 1
+    return this.contents.length
+  }
+  pop () {
+    if (this.index > -1) {
+      this.index -= 1
+    }
+    return this.contents.pop()
+  }
+  backward () {
+    if (this.index > 0) {
+      this.index -= 1
+    }
+  }
+  forward () {
+    if (this.index < this.contents.length - 1) {
+      this.index += 1
+    }
+  }
+}
+
 const boardPresets = {
   HIRATE: new Board([
     [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}],
@@ -458,6 +488,7 @@ export default {
   Board,
   Koma,
   Move,
+  MoveList,
   kansuji (i) {
     return '〇一二三四五六七八九'[i]
   },

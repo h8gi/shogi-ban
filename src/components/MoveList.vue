@@ -3,8 +3,8 @@
     <div v-for="m in contents">
       {{m}}
     </div>
-    <button>&lt;</button>
-    <button>&gt;</button>
+    <button @click="back">&lt;</button>
+    <button @click="forward">&gt;</button>
   </div>
 </template>
 
@@ -25,7 +25,13 @@ export default {
   },
   computed: {
   },
-  methods: {    
+  methods: {
+    back () {
+      this.$emit('back')
+    },
+    forward () {
+      this.$emit('forward')
+    }
   }
 }
 </script>

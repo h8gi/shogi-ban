@@ -145,11 +145,11 @@ export default {
       if (this.selected) {
         this.selected.classList.remove('selected')
         this.selected = null
-      }      
-    },    
+      }
+    },
     emitMove (pos) {
       this.move.to = pos        // set move
-      if (this.checkMove(this.move)) {        
+      if (this.checkMove(this.move)) {
         if (!this.move.isDrop() && this.koma.isPromotableAt(pos)) {
           this.askPromote()
         } else {
@@ -193,7 +193,7 @@ export default {
 
 <style lang="scss">
 @import '../assets/scss/common.scss';
-.board {
+.board {    
   text-align: center;
   position: relative;
   @include wide;
@@ -204,12 +204,12 @@ export default {
     position: absolute;
     /* 先手 */
     &.color-0 {
-      right: 100px;
+      right: 180px;
       bottom: 0px;
     }
     /* 後手 */
     &.color-1 {
-      left: 100px;
+      left: 180px;
       top: 0px;
     }
   }
@@ -220,8 +220,8 @@ table.ban {
   text-align: center;
   margin: 0 auto;
   td {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
   }
   td:not(.header) {
     border: 2px #000 solid;
@@ -232,7 +232,7 @@ table.ban {
   }
   td.header {
     width: 20px;
-    height: 20px;
+    height: 15px;
     pointer-events: none;
     &.x-header:before {
       content: attr(data-x-label);      

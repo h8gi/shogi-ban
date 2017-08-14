@@ -20,6 +20,7 @@ export default {
   name: 'hands',
   components: {
   },
+  mixins: [],
   props: {
     color: Number,
     turn: Number,
@@ -52,7 +53,7 @@ export default {
   ul {
     border: 3px solid #666;
     color: #666;
-    width: 105px;
+    width: 70px;
     height: 240px;
     padding: 0;
     margin: 0;
@@ -78,19 +79,22 @@ li {
   @include no-select;
   list-style: none;
   cursor: default;
-  font-size: 1.2em;
-  text-align: right;  
+  font-size: 1em;
+  text-align: left;
+  padding-left: 11px;
+  padding: 2px 0 0 11px;
   &.selected {
     background: #eee;
     font-weight: bold;    
   }
-  letter-spacing: 10px;
+  letter-spacing: 4px;
 }
 
 
-.color-0 ul{
-  &:before {
-    content: "先手☗";    
+ul:before {
+  padding: 2px 0;
+  .color-0 & {
+    content: "先手☗";
     display: inline-block;
     width: 100%;
     border-bottom: 2px solid #000;
@@ -98,9 +102,8 @@ li {
       border-bottom: 2px solid #666;
     }
   }
-}
-.color-1 ul{
-  &:before {
+
+  .color-1 & {
     content: "後手☖";
     display: inline-block;
     width: 100%;
@@ -109,7 +112,6 @@ li {
       border-bottom: 2px solid #666;
     }
   }
-  
 }
 
 .turn-0 .color-0, .turn-1 .color-1 {

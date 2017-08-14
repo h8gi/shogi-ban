@@ -85,7 +85,13 @@ class Board {
       // 打てる!
       return true
     } else {                    // 普通に
-      let koma = this.komaAt(move.from)       
+      let koma = this.komaAt(move.from)      
+      if (!koma.isValidMove(move)) { // 駒の動きとして正しいか
+        return false
+      }
+      if (move.info.long && !this.isValidLongMove(move)) {     // 長距離移動として正しいか
+        return false
+      }
       if (this.isEmptyAt(move.to)) { // 行き先空
         // 動かせる!
         return true
@@ -100,10 +106,44 @@ class Board {
     }
   }
 
+  // 飛車や角の動きで、間に駒が無いかどうか
+  isValidLongMove (move) {
+    let [minX, maxX] = [move.from.x, move.to.x].sort((a,b) => a > b)
+    let [minY, maxY] = [move.from.y, move.to.y].sort((a,b) => a > b)
+    switch (true) {
+    case /^(U|D)$/.test(move.info.direction):
+      // 上下
+      return _.range(minY+1, maxY).map(y => {
+        return {x: move.from.x, y: y}
+      }).every(pos => {
+        return this.isEmptyAt(pos)
+      })      
+    case /^(R|L)$/.test(move.info.direction):
+      // 左右
+      return _.range(minX+1, maxX).map(x => {
+        return {x: x, y: move.from.y}
+      }).every(pos => {
+        return this.isEmptyAt(pos)
+      })
+    default:
+      // 斜め
+      let yrange = /D/.test(move.info.direction) ? _.range(move.from.y+1, move.to.y) : _.range(move.to.y+1, move.from.y)
+      let xrange = /L/.test(move.info.direction) ? _.range(move.from.x+1, move.to.x) : _.range(move.to.x+1, move.from.x)
+      return yrange.map((y, i) => {
+        return {x: xrange[i], y: y}
+      }).every(pos => {
+        return this.isEmptyAt(pos)
+      })
+    }
+  }
+
   // 駒はそこにあるか
   isEmptyAt (pos) {
     return Koma.isEmpty(this.komaAt(pos))
   }
+
+  
+  
   // 将棋盤の端かどうか
   static isEdge (pos) {
     return pos.x === 1 || pos.x === 9 || pos.y === 1 || pos.y === 9
@@ -124,40 +164,19 @@ class Board {
 const komaMap = {
   FU: {
     kanji: '歩',
-    promote: 'TO',
-    togo (color, pos) {
-      let {x, y} = pos
-      y = color === 0 ? (y-1) : (y+1)
-      return [{x: x, y: y}]
-    }
+    promote: 'TO'
   },
   KY: {
     kanji: '香',
-    promote: 'NY',
-    togo (color, pos) {
-      let {x, y} = pos
-      let yarr = color === 0 ? _.range(y-1, 0) : _.range(y+1, 10)
-      return yarr.map(y => {
-        return {x: x, y: y}
-      })
-    }
+    promote: 'NY'
   },
   KE: {
     kanji: '桂',
-    promote: 'NK',
-    togo (color, pos) {
-      let {x, y} = pos
-      return [x+1, x-1].map(x => {
-        return {x: x, y: color === 0 ? y-2 : y+2}
-      })   
-    }
+    promote: 'NK'
   },
   GI: {
     kanji: '銀',
-    promote: 'NG',
-    togo (color, pos) {
-      
-    }
+    promote: 'NG'
   },
   KI: {
     kanji: '金'
@@ -236,6 +255,96 @@ class Koma {
   isPromoted () {  
     return ['TO', 'NY', 'NK', 'NG', 'UM', 'RY'].includes(this.kind)
   }
+
+  isValidMove (move) {
+    switch (this.kind) {
+    case 'FU':
+      if (this.color === 0) { // 先手
+        return move.info.direction === 'U' && move.info.dy === -1
+      } else {                // 後手        
+        return move.info.direction === 'D' && move.info.dy === 1
+      }
+    case 'KY':
+      if (this.color === 0) { // 先手
+        return move.info.direction === 'U'
+      } else {
+        return move.info.direction === 'D'
+      }
+    case 'KE':
+      if (this.color === 0) {
+        return (move.info.dx === 1 || move.info.dx === -1) && (move.info.dy === -2)
+      } else {
+        return (move.info.dx === 1 || move.info.dx === -1) && (move.info.dy === 2)
+      }
+    case 'GI':
+      if (this.color === 0) {   // 先手
+        // _.inRange(number, start, end) start <= number < end
+        if (move.info.dy === -1) { // 前方向3マス
+          return _.inRange(move.info.dx, -1, 2)
+        } else if (move.info.dy === 1) { // 後ろ2マス
+          return move.info.dx === -1 || move.info.dx === 1
+        } else {
+          return false
+        }
+      } else {                    // 後手
+        if (move.info.dy === 1) { // 前方向3マス
+          return _.inRange(move.info.dx, -1, 2)
+        } else if (move.info.dy === -1) { // 後ろ2マス
+          return move.info.dx === -1 || move.info.dx === 1
+        } else {
+          return false
+        }      
+      }
+    case 'KI':
+    case 'TO':
+    case 'NY':
+    case 'NK':
+    case 'NG':
+      if (this.color === 0) {   // 先手
+        if (move.info.dy === -1) { // 前方向3マス
+          return _.inRange(move.info.dx, -1, 2)
+        } else if (move.info.dy === 0) { // 横方向2マス
+          return move.info.dx === -1 || move.info.dx === 1
+        } else if (move.info.dy === 1) { // 後ろ1マス
+          return move.info.dx === 0
+        }
+      } else {                  // 後手
+        if (move.info.dy === 1) { // 前方向3マス
+          return _.inRange(move.info.dx, -1, 2)
+        } else if (move.info.dy === 0) { // 横方向2マス
+          return move.info.dx === -1 || move.info.dx === 1
+        } else if (move.info.dy === -1) { // 後ろ1マス
+          return move.info.dx === 0
+        }
+      }
+    case 'KA':
+      // 角
+      // 方向が斜めで、変則ジャンプでなければよい
+      return (move.info.direction.length === 2) && (!move.info.jump)
+    case 'UM':
+      if (move.info.long) {
+        return (move.info.direction.length === 2) && (!move.info.jump)
+      } else {
+        // 周り全部
+        return !move.info.jump
+      }
+    case 'HI':
+      // 方向が縦横で、変則ジャンプでなければよい
+      return (move.info.direction.length === 1) && (!move.info.jump)
+    case 'RY':
+      if (move.info.long) {
+        return (move.info.direction.length === 1) && (!move.info.jump)
+      } else {
+        return !move.info.jump
+      }
+    case 'OU':
+      // 長距離でも変則ジャンプでもなければよい
+      return (!move.info.long) && (!move.info.jump)
+    default:
+      return false
+    }
+  }
+  
   movablePosArray (from) {
     return komaMap[this.kind].togo(this.color, from)    
   }
@@ -258,15 +367,53 @@ class Koma {
 
 class Move {
   constructor (params) {
-    Object.assign(this, params)
+    Object.assign(this, params)    
   }
-
+  
   isDrop () {
     return this.from === undefined
   }
 
-  direction () {
-    
+  get info () {
+    if (this.isDrop()) {
+      return undefined
+    }
+    let dobj = {
+      dx: this.to.x - this.from.x,
+      dy: this.to.y - this.from.y,
+      direction: '',            // 方向 (Left,Right,Down,Up)
+      jump: false,              // 変則(桂)
+      long: false               // 2以上の移動(香飛角竜馬)
+    }
+    switch (Math.sign(dobj.dx)) {
+    case 1:
+      dobj.direction += 'L'
+      break
+    case -1:
+      dobj.direction += 'R'
+      break
+    }
+    switch (Math.sign(dobj.dy)) {
+    case 1:
+      dobj.direction += 'D'
+      break
+    case -1:
+      dobj.direction += 'U'
+      break
+    }       
+    if (dobj.direction.length === 2) {  // 斜めの動きかどうかチェック
+      if (Math.abs(dobj.dx) !== Math.abs(dobj.dy)) { // 斜めではない = 変則ジャンプ
+        dobj.jump = true
+        return dobj
+      }
+      // 距離チェック
+      dobj.long = Math.abs(dobj.dx) > 1
+    } else { // 縦横
+      // 横(LR)ならdxが2以上かどうか
+      // 縦(DU)ならdyが2以上かどうか
+      dobj.long = 'LR'.includes(dobj.direction) ? (Math.abs(dobj.dx) > 1) : (Math.abs(dobj.dy) > 1)
+    }
+    return dobj
   }
 }
 

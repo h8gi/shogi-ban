@@ -43,12 +43,13 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/scss/common.scss';
 .koma {
-  @include no-select;
+  @include no-select;    
   cursor: default;
   /* pointer-events: none; */
   width: 100%;
   height: 100%;
-  font-size: 2em;
+  font-size: 1.6em;
+  line-height: 160%;
   &.reverse {
     transform: rotate(180deg);  
   }

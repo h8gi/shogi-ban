@@ -8,7 +8,7 @@
           <koma v-if="x !== 0 && y !== 0 && !boardData.isEmptyAt({x: x, y: y})"
                 :pos="{x: x, y: y}"
                 :contents="boardData.komaAt({x: x, y: y})"
-                :class="latestMove !== null && latestMove.to.x === x && latestMove.to.y === y ? 'latest-move' : ''"
+                :class="latestMove && latestMove.to.x === x && latestMove.to.y === y ? 'latest-move' : ''"
                 @koma-clicked="komaClicked">
           </koma>
         </td>

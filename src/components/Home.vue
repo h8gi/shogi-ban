@@ -3,48 +3,55 @@
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
     <button @click="toggleSounds">{{ sounds ? "音量OFF" : "音量ON"}}</button>
+    <button @click="remove">一手削除</button>
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            @move="handleMove"
            :class="'turn-'+turn"
            :turn="turn"
            :latest-move="latestMove"></board>
-    <moves :contents="moves"></moves>
+    <move-list :contents="moves"></move-list>
   </div>
 </template>
 
 <script>
 import Board from '@/components/Board'
-import Moves from '@/components/Moves'
+import MoveList from '@/components/MoveList'
 import syogi from '@/syogi-lib'
 export default {
   name: 'home',
   components: {
     Board,
-    Moves
+    MoveList
   },
   data () {
     return {
       boardData: syogi.boardPresets.HIRATE,
       reverse: false,
       showNum: true,
-      moves: [{}],
+      moves: [],
       turn: 0,
-      latestMove: null,
       sounds: true,
       komaoto: new Audio(require('@/assets/mp3/komaoto.mp3')) // https://on-jin.com
+    }
+  },
+  computed: {
+    latestMove () {
+      return this.moves[this.moves.length-1]
     }
   },
   methods: {
     handleMove (move, elem) {
       this.toggleTurn()
       this.moves.push(move)
+      this.playSounds()
       this.boardData.runMove(move)
-      this.latestMove = move
-      if (this.sounds) {
-        if (this.komaoto.currentTime) {
-          this.komaoto.currentTime = 0
-        }
-        this.komaoto.play()
+    },
+    remove () {
+      if (this.moves.length > 0) {        
+        let move = this.moves.pop()
+        this.toggleTurn()
+        this.playSounds()
+        this.boardData.revMove(move)      
       }      
     },
     invert () {
@@ -58,6 +65,14 @@ export default {
     },
     toggleSounds () {
       this.sounds = !this.sounds
+    },
+    playSounds () {
+      if (this.sounds) {
+        if (this.komaoto.currentTime) {
+          this.komaoto.currentTime = 0
+        }
+        this.komaoto.play()
+      }
     }
   }
 }

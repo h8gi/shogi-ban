@@ -37,7 +37,7 @@ class Board {
     }
     this.hands[koma.color][kind] += 1
   }
-  removeHands (koma) {
+  removeHands (koma) {    
     this.hands[koma.color][koma.kind] -= 1
   }
   
@@ -62,25 +62,38 @@ class Board {
   }
   // 逆
   revMove (move) {
-    let koma = this.take(move.to)  // remove koma from `to` position.
+    this.take(move.to)  // remove koma from `to` position.
+    let koma = move.koma
     if (move.isDrop()) { // 打つ     
-      this.addHands(koma)          // return koma to hands.
+      this.addHands(koma)       // return koma to hands.
     } else {
       if (move.capture !== undefined) { // capture
-        let captured = new Koma(changeTurn(koma.color), move.capture)
-        this.put(move.to, captured)
-      }
-      if (move.promote) {
-        koma = koma.demote()
+        let captured = new Koma(koma.color, move.capture)        
+        this.removeHands(captured.isPromoted() ? captured.demote() : captured)
+        this.put(move.to, captured.betray())
       }
       this.put(move.from, koma)
     }
   }
 
-  isValidMove (move) {
+  isValidMove (move, nifucheck = true) {
     if (move.isDrop()) { // 打つ
       if (!this.isEmptyAt(move.to)) { // もう駒あるよ
         return false
+      }
+      
+      if (nifucheck && move.piece === 'FU') {
+        // 二歩チェック
+        return _.range(1, 10).map(y => {
+          return {x: move.to.x, y: y}
+        }).every(pos => {
+          if (this.isEmptyAt(pos)) {
+            return true
+          }
+          let koma = this.komaAt(pos)
+          // 自分の歩があるかどうか
+          return !( (koma.kind === 'FU') && (koma.color === move.color) )
+        })
       }
       // 打てる!
       return true
@@ -238,6 +251,10 @@ class Koma {
   demote () {
     return new Koma(this.color, komaMap[this.kind].demote)
   }
+  betray () {
+    return new Koma(changeColor(this.color), this.kind)
+  }
+  
   // Can I promote at the pos?
   isPromotableAt (pos) {
     // そもそも成れない駒
@@ -348,10 +365,7 @@ class Koma {
   movablePosArray (from) {
     return komaMap[this.kind].togo(this.color, from)    
   }
-  // destructive! 
-  betray () {
-    this.color = this.color === 0 ? 1 : 0
-  }
+
   static isEmpty (koma) {
     return Object.keys(koma).length === 0
   }
@@ -415,6 +429,10 @@ class Move {
     }
     return dobj
   }
+
+  get koma () {
+    return new Koma(this.color, this.piece)
+  }
 }
 
 const boardPresets = {
@@ -429,6 +447,10 @@ const boardPresets = {
     [{color:1, kind:'KE'}, {color:1, 'kind':'HI'},{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {color:0, kind:'KA'}, {color:0, kind:'KE'}],
     [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}]
   ], Board.emptyHands())
+}
+
+function changeColor (color) {
+  return color === 0 ? 1 : 0
 }
 
 export default {  

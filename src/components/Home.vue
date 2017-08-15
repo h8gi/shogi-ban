@@ -6,15 +6,14 @@
        @contextmenu.prevent>
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
-    <button @click="toggleEdit">{{editMode ? "" : "盤面を編集"}}</button>
     <button @click="toggleSounds">音を{{ sounds ? "OFF" : "ON"}}に</button>
     <button @click="remove">一手削除</button>    
-    <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
+    <board :board-data="game.board" :reverse="reverse" :show-num="showNum"
            @move="handleMove"
-           :class="'turn-'+boardData.color"
+           :class="'turn-'+game.board.color"
            :latest-move="latestMove"
            :edit-mode="editMode"></board>
-    <move-list :contents="moves"
+    <move-list :moves="game.moves"
                @back="handleBackward"
                @forward="handleForward"></move-list>
   </div>
@@ -32,19 +31,17 @@ export default {
   },
   data () {
     return {
-      boardData: syogi.boardPresets.HIRATE(),
+      game: new syogi.Game({}),
       reverse: false,
       showNum: true,
       editMode: false,
-      moves: [],
-      currentPos: -1,
       sounds: true,
       komaoto: new Audio(require('@/assets/mp3/komaoto.mp3')) // https://on-jin.com
     }
   },
   computed: {
     latestMove () {
-      return this.moves[this.moves.length-1]
+      return this.game.moves.last()
     }
   },
   methods: {
@@ -55,19 +52,13 @@ export default {
       console.log('backward')
     },
     handleMove (move, elem) {
-      if (!this.editMode) {
-        this.moves.push(move)
-        this.playSounds()        
-      }
-      this.boardData.runMove(move)
+      this.playSounds()
+      this.game.addMove(move)
     },
     remove () {
-      if (!this.editMode) {
-        if (this.moves.length > 0) {        
-          let move = this.moves.pop()
-          this.playSounds()
-          this.boardData.revMove(move)      
-        }      
+      if (!this.editMode && !this.game.moves.isEmpty()) {
+        this.playSounds()
+        this.game.deleteMove()
       }      
     },
     invert () {
@@ -84,7 +75,6 @@ export default {
     },
     toggleEdit () {
       this.editMode = !this.editMode
-      this.moves = []
     },
     playSounds () {
       if (this.sounds) {

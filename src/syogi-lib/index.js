@@ -485,18 +485,23 @@ class Move {
 class MoveList {
   constructor (array) {
     this.contents = array
-    this.index = -1
+    this.index = 0
   }
   push (move) {
-    this.contents.push(move)
-    this.index += 1
+    this.contents.push(move)    
     return this.contents.length
   }
   pop () {
-    if (this.index > -1) {
-      this.index -= 1
-    }
     return this.contents.pop()
+  }
+  current () {
+    return this.contents[this.index]
+  }
+  last () {
+    return this.contents[this.contents.length-1]
+  }
+  isEmpty () {
+    return this.contents.length === 0
   }
   backward () {
     if (this.index > 0) {
@@ -525,7 +530,19 @@ class Game {
     } else {
       this.board = boardPresets['HIRATE']()
     }
+    this.moves = new MoveList([])
   }
+
+  addMove (move) {
+    this.moves.push(move)
+    this.board.runMove(move)
+  }
+
+  deleteMove () {
+    let move = this.moves.pop()
+    this.board.revMove(move)
+  }
+  
 }
 
 const boardPresets = {
@@ -554,7 +571,8 @@ function color2kigou (color) {
   return '☗☖'[color]
 }
 
-export default {  
+export default {
+  Game,
   boardPresets,
   Board,
   Koma,

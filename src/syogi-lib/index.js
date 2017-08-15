@@ -177,8 +177,8 @@ class Board {
   }
 
   static emptyHands () {
-    return [{FU: 0, KY: 0, KE: 0, GI: 0, KI: 0, KA: 0, HI: 0},
-            {FU: 0, KY: 0, KE: 0, GI: 0, KI: 0, KA: 0, HI: 0}]
+    return [{FU: 0, KY: 0, KE: 0, GI: 0, KI: 0, KA: 0, HI: 0, OU: 0},
+            {FU: 0, KY: 0, KE: 0, GI: 0, KI: 0, KA: 0, HI: 0, OU: 0}]
   }
 }
 

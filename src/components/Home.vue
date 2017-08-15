@@ -6,6 +6,7 @@
        @contextmenu.prevent>
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
+    <button @click="toggleEdit">{{editMode ? "" : "盤面を編集"}}</button>
     <button @click="toggleSounds">音を{{ sounds ? "OFF" : "ON"}}に</button>
     <button @click="remove">一手削除</button>    
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"

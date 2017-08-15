@@ -4,9 +4,7 @@
        @click.self="click"
        @keyup.down="down"
        @keyup.up="up"
-       @keyup.right="right"
-       @keyup.left="left"
-       tabindex=0>
+       tabindex="0">
     {{contents.kanji}}
   </div>
 </template>
@@ -45,12 +43,6 @@ export default {
     },
     up (e) {
       this.$emit('koma-up', this.contents, this.pos, e)
-    },
-    right (e) {
-      this.$emit('koma-right', this.contents, this.pos, e)
-    },
-    left (e) {
-      this.$emit('koma-left', this.contents, this.pos, e)
     }
   }
 }
@@ -71,13 +63,13 @@ export default {
     transform: rotate(180deg);  
   }
   &:focus {
-    outline: none;    
+    outline: none;
   }
 }
 
 .play .turn-0 .color-0, .play .turn-1 .color-1{
   cursor: pointer;
-  &:focus {
+  &.selected {
     font-weight: bold;
     background-color: #eee;
   }
@@ -86,7 +78,7 @@ export default {
 }
 .edit .koma{
   cursor: pointer; 
-  &:focus {
+  &.selected, &:focus {
     font-weight: bold;
     background-color: #eee;
   }

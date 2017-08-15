@@ -3,12 +3,11 @@
     <span id="teban" :class="color === turn ? 'visible' : 'hidden'">
       &lt;手番&gt;
     </span>
-    <ul>
+    <ul @click.self="handsClick(color)">
       <li v-for="(count, kind) in contents"
           v-if="count !== 0"
           :class="'hands-'+kind"
-          @click="click(color, kind, $event)"
-          tabindex="0"> 
+          @click="click(color, kind, $event)"> 
         {{kanji(kind) + " " + count}}
       </li>
     </ul>
@@ -38,7 +37,10 @@ export default {
       return syogi.Koma.kind2kanji(kind)
     },
     click (color, kind, e) {
-      this.$emit('hands-clicked', new syogi.Koma(color, kind), e)
+      this.$emit('hands-koma-clicked', new syogi.Koma(color, kind), e)
+    },
+    handsClick (color) {
+      this.$emit('hands-clicked', color)
     }
   }
 }
@@ -88,9 +90,6 @@ li {
   padding-left: 11px;
   padding: 2px 0 0 11px;
   letter-spacing: 4px;
-  &:focus {
-    outline: none;
-  }
 }
 
 
@@ -124,7 +123,7 @@ ul:before {
   }  
   li {
     cursor: pointer;
-    &:focus {
+    &.selected {
       background: #eee;
       font-weight: bold;
     }
@@ -138,7 +137,7 @@ ul:before {
   }
   li {
     cursor: pointer;
-    &:focus {
+    &.selected {
       background: #eee;
       font-weight: bold;
     }

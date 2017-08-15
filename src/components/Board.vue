@@ -11,19 +11,19 @@
                 :class="latestMove && latestMove.to.x === x && latestMove.to.y === y ? 'latest-move' : ''"
                 @koma-clicked="komaClicked"
                 @koma-up="komaUp"
-                @koma-down="komaDown"
-                @koma-left="komaLeft"
-                @koma-right="komaRight">
+                @koma-down="komaDown">
           </koma>
         </td>
       </tr>
     </table>    
     <!-- 先手 -->
     <hands :color="0" :turn="boardData.color" :contents="boardData.hands[0]"
-           @hands-clicked="handsClicked"></hands>
+           @hands-clicked="handsClicked"
+           @hands-koma-clicked="handsKomaClicked"></hands>
     <!-- 後手 -->
     <hands :color="1" :turn="boardData.color" :contents="boardData.hands[1]"
-           @hands-clicked="handsClicked"></hands>
+           @hands-clicked="handsClicked"
+           @hands-koma-clicked="handsKomaClicked"></hands>
   </div>
 </template>
 
@@ -47,7 +47,8 @@ export default {
         to: {},
         piece: '',
         color: 0,
-      })
+      }),
+      selected: null
     }
   },
   computed: {
@@ -101,10 +102,12 @@ export default {
       return cls
     },
     masuClicked (pos, e) {
-      if ( this.move.piece === '' ) { // koma is not selected.
+      if ( !this.selected ) { // koma is not selected.
         // do nothing
       } else { // koma is already selected.
-        this.emitMove(pos)
+        if (this.boardData.isEmptyAt(pos)) {
+          this.emitMove(pos)
+        }
       }
     },
     komaClicked (koma, pos, e) {
@@ -113,7 +116,7 @@ export default {
         this.startMove(koma, pos, e)
       } else {
         // 通常の動作
-        if ( this.move.piece === '' ) { // koma is not selected.
+        if ( !this.selected ) { // koma is not selected.
           if ( this.checkTurn(koma) ) { // turn check
             this.startMove(koma, pos, e)
           }
@@ -127,7 +130,22 @@ export default {
         }
       }
     },
-    handsClicked (koma, e) {
+    handsClicked (color) {
+      if (this.editMode) {
+        if ( this.selected ) {
+          if ( this.move.isDrop() ) {            
+            this.boardData.removeHands(this.koma)
+            this.boardData.addHands(this.koma.betray())
+          } else {
+            let koma = this.boardData.take(this.move.from)
+            koma.color = color
+            this.boardData.addHands(koma)
+          }
+          this.clearMove()
+        }
+      }
+    },
+    handsKomaClicked (koma, e) {
       if ( this.checkTurn(koma) ) { // turn check
         this.startMove(koma, undefined, e)
       }
@@ -140,6 +158,9 @@ export default {
         piece: koma.kind,
         color: koma.color
       })
+      this.selected = e.target
+      this.selected.classList.add('selected')
+      
     },
     // clear the data 'move'
     clearMove () {
@@ -149,6 +170,10 @@ export default {
         piece: '',
         color: 0        
       })
+      if (this.selected) {
+        this.selected.classList.remove('selected')
+        this.selected = null
+      }      
     },
     emitMove (pos) {
       this.move.to = pos        // set move
@@ -185,22 +210,6 @@ export default {
           koma.demoteD()
           this.move.piece = koma.kind
         }
-      }
-    },
-    komaRight (koma, pos, e) {
-      if (this.editMode) {
-        this.clearMove()
-        this.boardData.take(pos)
-        koma.color = 0
-        this.boardData.addHands(koma)
-      }      
-    },
-    komaLeft (koma, pos, e) {
-      if (this.editMode) {
-        this.clearMove()
-        this.boardData.take(pos)
-        koma.color = 1
-        this.boardData.addHands(koma)
       }
     },
     checkMove (move) {      

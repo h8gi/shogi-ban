@@ -1,17 +1,20 @@
 <template>
   <div class="home" tabindex="0"
-       @keyup.right="forward"
-       @keyup.left="backward">
+       :class="editMode ? 'edit' : 'play'"
+       @keyup.right="handleForward"
+       @keyup.left="handleBackward"
+       @contextmenu.prevent>
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
-    <button @click="toggleSounds">{{ sounds ? "音量OFF" : "音量ON"}}</button>
-    <button @click="remove">一手削除</button>
+    <button @click="toggleSounds">音を{{ sounds ? "OFF" : "ON"}}に</button>
+    <button @click="remove">一手削除</button>    
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            @move="handleMove"
            :class="'turn-'+boardData.color"
-           :latest-move="latestMove"></board>
+           :latest-move="latestMove"
+           :edit-mode="editMode"></board>
     <move-list :contents="moves"
-               @back="handleBack"
+               @back="handleBackward"
                @forward="handleForward"></move-list>
   </div>
 </template>
@@ -28,9 +31,10 @@ export default {
   },
   data () {
     return {
-      boardData: syogi.boardPresets.HIRATE,
+      boardData: syogi.boardPresets.HIRATE(),
       reverse: false,
       showNum: true,
+      editMode: false,
       moves: [],
       currentPos: -1,
       sounds: true,
@@ -43,26 +47,26 @@ export default {
     }
   },
   methods: {
-    forward () {
+    handleForward () {
       console.log('forward')
     },
-    backward () {
+    handleBackward () {
       console.log('backward')
     },
-    handleForward () {      
-    },
-    handleBack () {
-    },
     handleMove (move, elem) {
-      this.moves.push(move)
-      this.playSounds()
+      if (!this.editMode) {
+        this.moves.push(move)
+        this.playSounds()        
+      }
       this.boardData.runMove(move)
     },
     remove () {
-      if (this.moves.length > 0) {        
-        let move = this.moves.pop()
-        this.playSounds()
-        this.boardData.revMove(move)      
+      if (!this.editMode) {
+        if (this.moves.length > 0) {        
+          let move = this.moves.pop()
+          this.playSounds()
+          this.boardData.revMove(move)      
+        }      
       }      
     },
     invert () {
@@ -77,6 +81,10 @@ export default {
     toggleSounds () {
       this.sounds = !this.sounds
     },
+    toggleEdit () {
+      this.editMode = !this.editMode
+      this.moves = []
+    },
     playSounds () {
       if (this.sounds) {
         if (this.komaoto.currentTime) {
@@ -90,7 +98,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../assets/scss/common.scss';
 .home {
   @include wide;

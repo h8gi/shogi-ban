@@ -9,7 +9,11 @@
                 :pos="{x: x, y: y}"
                 :contents="boardData.komaAt({x: x, y: y})"
                 :class="latestMove && latestMove.to.x === x && latestMove.to.y === y ? 'latest-move' : ''"
-                @koma-clicked="komaClicked">
+                @koma-clicked="komaClicked"
+                @koma-up="komaUp"
+                @koma-down="komaDown"
+                @koma-left="komaLeft"
+                @koma-right="komaRight">
           </koma>
         </td>
       </tr>
@@ -43,8 +47,7 @@ export default {
         to: {},
         piece: '',
         color: 0,
-      }),
-      selected: null
+      })
     }
   },
   computed: {
@@ -68,6 +71,10 @@ export default {
     latestMove: {
       type: Object,
       default: null
+    },
+    editMode: {
+      type: Boolean,
+      default: false
     }
   },
   watch: {
@@ -100,22 +107,28 @@ export default {
         this.emitMove(pos)
       }
     },
-    komaClicked (koma, pos, e) {      
-      if ( this.move.piece === '' ) { // koma is not selected.
-        if ( koma.color === this.boardData.color ) { // turn check
-          this.startMove(koma, pos, e)
-        }
-      } else { // koma is already selected.
-        if (koma.color === this.move.color) { // 自駒
-          this.startMove(koma, pos, e)
-        } else {                // 駒をとる
-          this.move.capture = koma.kind
-          this.emitMove(pos)
+    komaClicked (koma, pos, e) {
+      if (this.editMode) {
+        // 編集モード
+        this.startMove(koma, pos, e)
+      } else {
+        // 通常の動作
+        if ( this.move.piece === '' ) { // koma is not selected.
+          if ( this.checkTurn(koma) ) { // turn check
+            this.startMove(koma, pos, e)
+          }
+        } else { // koma is already selected.
+          if (koma.color === this.move.color) { // 自駒
+            this.startMove(koma, pos, e)
+          } else {                // 駒をとる
+            this.move.capture = koma.kind
+            this.emitMove(pos)
+          }
         }
       }
     },
     handsClicked (koma, e) {
-      if ( koma.color === this.boardData.color ) { // turn check
+      if ( this.checkTurn(koma) ) { // turn check
         this.startMove(koma, undefined, e)
       }
     },
@@ -127,8 +140,6 @@ export default {
         piece: koma.kind,
         color: koma.color
       })
-      this.selected = e.target
-      this.selected.classList.add('selected')
     },
     // clear the data 'move'
     clearMove () {
@@ -138,28 +149,67 @@ export default {
         piece: '',
         color: 0        
       })
-      if (this.selected) {
-        this.selected.classList.remove('selected')
-        this.selected = null
-      }
     },
     emitMove (pos) {
       this.move.to = pos        // set move
       if (this.checkMove(this.move)) {
-        if (!this.move.isDrop() && this.koma.isPromotableAt(pos)) {
-          this.askPromote()
-        } else {
+        if (this.editMode) {
           this.$emit('move', this.move) // emit move
-          this.clearMove()
+          this.clearMove()          
+        } else {
+          if (!this.move.isDrop() && this.koma.isPromotableAt(pos)) {
+            this.askPromote()
+          } else {
+            this.$emit('move', this.move) // emit move
+            this.clearMove()
+          }
         }
       } else {
         this.clearMove()
       }
     },
-    checkMove (move) {
-      return this.boardData.isValidMove(move)
+    komaUp (koma, pos, e) {
+      if (this.editMode) {
+        koma.betrayD()
+        this.move.color = koma.color        
+      }
     },
-    askPromote () {                  
+    komaDown (koma, pos, e) {
+      console.log('hello')
+      if (this.editMode) {
+        if (koma.isPromotable()) {
+          console.log('hello')
+          koma.promoteD()
+          this.move.piece = koma.kind
+        } else if (koma.isPromoted()) {
+          koma.demoteD()
+          this.move.piece = koma.kind
+        }
+      }
+    },
+    komaRight (koma, pos, e) {
+      if (this.editMode) {
+        this.clearMove()
+        this.boardData.take(pos)
+        koma.color = 0
+        this.boardData.addHands(koma)
+      }      
+    },
+    komaLeft (koma, pos, e) {
+      if (this.editMode) {
+        this.clearMove()
+        this.boardData.take(pos)
+        koma.color = 1
+        this.boardData.addHands(koma)
+      }
+    },
+    checkMove (move) {      
+      return this.editMode || this.boardData.isValidMove(move)
+    },
+    checkTurn (koma) {
+      return this.editMode || (this.boardData.color === koma.color)
+    },
+    askPromote () {
       alertify
         .confirm('成りますか？', () => {
           // yes

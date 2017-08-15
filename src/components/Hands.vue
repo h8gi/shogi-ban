@@ -7,7 +7,8 @@
       <li v-for="(count, kind) in contents"
           v-if="count !== 0"
           :class="'hands-'+kind"
-          @click="click(color, kind, $event)">      
+          @click="click(color, kind, $event)"
+          tabindex="0"> 
         {{kanji(kind) + " " + count}}
       </li>
     </ul>
@@ -66,10 +67,13 @@ export default {
 
   #teban {
     font-weight: bold;
-    &.visible {
+    .play &.visible {
       visibility: visible;
     }
-    &.hidden {
+    .play &.hidden {
+      visibility: hidden;
+    }
+    .edit & {
       visibility: hidden;
     }
   }
@@ -83,11 +87,10 @@ li {
   text-align: left;
   padding-left: 11px;
   padding: 2px 0 0 11px;
-  &.selected {
-    background: #eee;
-    font-weight: bold;    
-  }
   letter-spacing: 4px;
+  &:focus {
+    outline: none;
+  }
 }
 
 
@@ -114,13 +117,31 @@ ul:before {
   }
 }
 
-.turn-0 .color-0, .turn-1 .color-1 {
+.play .turn-0 .color-0, .play .turn-1 .color-1 {
   ul {
     border: 3px solid #000;
     color: #000;
   }  
   li {
     cursor: pointer;
+    &:focus {
+      background: #eee;
+      font-weight: bold;
+    }
+  }
+  
+}
+.edit {
+  ul {
+    border: 3px solid #000;
+    color: #000;
+  }
+  li {
+    cursor: pointer;
+    &:focus {
+      background: #eee;
+      font-weight: bold;
+    }
   }
 }
 

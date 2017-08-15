@@ -1,7 +1,7 @@
 <template>
   <div class="move-list">
     <div v-for="m in contents">
-      {{m}}
+      {{m.toString()}}
     </div>
     <button @click="back">&lt;</button>
     <button @click="forward">&gt;</button>

@@ -264,11 +264,22 @@ class Koma {
   betray () {
     return new Koma(changeColor(this.color), this.kind)
   }
-  
+  promoteD () {
+    this.kind = komaMap[this.kind].promote
+  }
+  demoteD () {
+    this.kind = komaMap[this.kind].demote
+  }
+  betrayD () {
+    this.color = changeColor(this.color)
+  }
+  isPromotable () {
+    return komaMap[this.kind].promote !== undefined
+  }  
   // Can I promote at the pos?
   isPromotableAt (pos) {
     // そもそも成れない駒
-    if (komaMap[this.kind].promote === undefined) {
+    if (!this.isPromotable()) {
       return false
     }
     // 先手
@@ -451,6 +462,24 @@ class Move {
   get koma () {
     return new Koma(this.color, this.piece)
   }
+
+  toString () {
+    let str = color2kigou(this.color) + this.to.x + kansuji(this.to.y) + komaMap[this.piece].kanji
+    if (this.promote === true) {
+      str += '成'
+    } else if (this.promote === false) {
+      str += '不成'
+    }
+    
+    if (!this.isDrop()) {
+      str += '(' + this.from.x + kansuji(this.from.y) + ')'
+    } else {
+      str += '(打)'
+    }
+    
+    return str
+    
+  }
 }
 
 class MoveList {
@@ -491,30 +520,38 @@ class Game {
                                jkf.initial.data.hands,
                                jkf.initial.data.color)
       } else {
-        this.board = boardPresets[jkf.initial.preset]
+        this.board = boardPresets[jkf.initial.preset]()
       }
     } else {
-      this.board = boardPresets['HIRATE']
+      this.board = boardPresets['HIRATE']()
     }
   }
 }
 
 const boardPresets = {
-  HIRATE: new Board([
-    [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}],
-    [{color:1, kind:'KE'}, {color:1, 'kind':'KA'},{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {color:0, kind:'HI'}, {color:0, kind:'KE'}],
-    [{color:1, kind:'GI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'GI'}],
-    [{color:1, kind:'KI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KI'}],
-    [{color:1, kind:'OU'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'OU'}],
-    [{color:1, kind:'KI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KI'}],
-    [{color:1, kind:'GI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'GI'}],
-    [{color:1, kind:'KE'}, {color:1, 'kind':'HI'},{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {color:0, kind:'KA'}, {color:0, kind:'KE'}],
-    [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}]
-  ], Board.emptyHands())
+  HIRATE () {
+    return new Board([
+      [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}],
+      [{color:1, kind:'KE'}, {color:1, 'kind':'KA'},{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {color:0, kind:'HI'}, {color:0, kind:'KE'}],
+      [{color:1, kind:'GI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'GI'}],
+      [{color:1, kind:'KI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KI'}],
+      [{color:1, kind:'OU'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'OU'}],
+      [{color:1, kind:'KI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KI'}],
+      [{color:1, kind:'GI'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'GI'}],
+      [{color:1, kind:'KE'}, {color:1, 'kind':'HI'},{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {color:0, kind:'KA'}, {color:0, kind:'KE'}],
+      [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}]
+    ], Board.emptyHands())
+  }
 }
 
 function changeColor (color) {
   return color === 0 ? 1 : 0
+}
+function kansuji (i) {
+  return '〇一二三四五六七八九'[i]
+}
+function color2kigou (color) {
+  return '☗☖'[color]
 }
 
 export default {  
@@ -523,7 +560,6 @@ export default {
   Koma,
   Move,
   MoveList,
-  kansuji (i) {
-    return '〇一二三四五六七八九'[i]
-  }
+  kansuji,
+  changeColor
 }

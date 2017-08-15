@@ -1,7 +1,12 @@
 <template>
   <div class="koma"
        :class="className"
-       @click.self="click">
+       @click.self="click"
+       @keyup.down="down"
+       @keyup.up="up"
+       @keyup.right="right"
+       @keyup.left="left"
+       tabindex=0>
     {{contents.kanji}}
   </div>
 </template>
@@ -34,6 +39,18 @@ export default {
     },
     click (e) {      
       this.$emit('koma-clicked', this.contents, this.pos, e)
+    },
+    down (e) {
+      this.$emit('koma-down', this.contents, this.pos, e)
+    },
+    up (e) {
+      this.$emit('koma-up', this.contents, this.pos, e)
+    },
+    right (e) {
+      this.$emit('koma-right', this.contents, this.pos, e)
+    },
+    left (e) {
+      this.$emit('koma-left', this.contents, this.pos, e)
     }
   }
 }
@@ -53,15 +70,25 @@ export default {
   &.reverse {
     transform: rotate(180deg);  
   }
+  &:focus {
+    outline: none;    
+  }
 }
 
-.turn-0 .color-0, .turn-1 .color-1{
+.play .turn-0 .color-0, .play .turn-1 .color-1{
   cursor: pointer;
-  &.selected {
+  &:focus {
     font-weight: bold;
     background-color: #eee;
-  }  
+  }
   &:hover {
+  }
+}
+.edit .koma{
+  cursor: pointer; 
+  &:focus {
+    font-weight: bold;
+    background-color: #eee;
   }
 }
 

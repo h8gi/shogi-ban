@@ -56,12 +56,15 @@ export default {
       this.game.backward()
     },
     handleMove (move, elem) {
-      this.playSounds()
-      this.game.addMove(move)
+      if (this.game.moves.currentIndex === this.game.moves.lastIndex) {
+        this.playSounds()
+        this.game.addMove(move)
+      } else {
+        // forks
+      }
     },
     remove () {
-      if (!this.editMode && !this.game.moves.isEmpty()) {
-        this.playSounds()
+      if (!this.editMode && !this.game.moves.isEmpty() && this.game.moves.lastIndex > 0) {
         this.game.deleteMove()
       }      
     },

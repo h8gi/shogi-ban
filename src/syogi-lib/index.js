@@ -555,9 +555,12 @@ class Game {
   }
 
   deleteMove () {
+    let islast = this.moves.currentIndex === this.moves.lastIndex
     let move = this.moves.pop()
     this.board.revMove(move)
-    this.moves.currentIndex = this.moves.lastIndex
+    if (islast) {
+      this.moves.currentIndex = this.moves.lastIndex
+    }    
   }
 
   forward () {

@@ -1,13 +1,14 @@
 <template>
-  <div class="home">
+  <div class="home" tabindex="0"
+       @keyup.right="forward"
+       @keyup.left="backward">
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
     <button @click="toggleSounds">{{ sounds ? "音量OFF" : "音量ON"}}</button>
     <button @click="remove">一手削除</button>
     <board :board-data="boardData" :reverse="reverse" :show-num="showNum"
            @move="handleMove"
-           :class="'turn-'+turn"
-           :turn="turn"
+           :class="'turn-'+boardData.color"
            :latest-move="latestMove"></board>
     <move-list :contents="moves"
                @back="handleBack"
@@ -32,7 +33,6 @@ export default {
       showNum: true,
       moves: [],
       currentPos: -1,
-      turn: 0,
       sounds: true,
       komaoto: new Audio(require('@/assets/mp3/komaoto.mp3')) // https://on-jin.com
     }
@@ -43,12 +43,17 @@ export default {
     }
   },
   methods: {
+    forward () {
+      console.log('forward')
+    },
+    backward () {
+      console.log('backward')
+    },
     handleForward () {      
     },
     handleBack () {
     },
     handleMove (move, elem) {
-      this.toggleTurn()
       this.moves.push(move)
       this.playSounds()
       this.boardData.runMove(move)
@@ -56,7 +61,6 @@ export default {
     remove () {
       if (this.moves.length > 0) {        
         let move = this.moves.pop()
-        this.toggleTurn()
         this.playSounds()
         this.boardData.revMove(move)      
       }      
@@ -90,5 +94,8 @@ export default {
 @import '../assets/scss/common.scss';
 .home {
   @include wide;
+  &:focus {
+    outline: none;
+  }
 }
 </style>

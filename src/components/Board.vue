@@ -15,10 +15,10 @@
       </tr>
     </table>    
     <!-- 先手 -->
-    <hands :color="0" :turn="turn" :contents="boardData.hands[0]"
+    <hands :color="0" :turn="boardData.color" :contents="boardData.hands[0]"
            @hands-clicked="handsClicked"></hands>
     <!-- 後手 -->
-    <hands :color="1" :turn="turn" :contents="boardData.hands[1]"
+    <hands :color="1" :turn="boardData.color" :contents="boardData.hands[1]"
            @hands-clicked="handsClicked"></hands>
   </div>
 </template>
@@ -65,10 +65,6 @@ export default {
       type: Boolean,
       default: true
     },
-    turn: {
-      type: Number,
-      default: 0
-    },
     latestMove: {
       type: Object,
       default: null
@@ -106,7 +102,7 @@ export default {
     },
     komaClicked (koma, pos, e) {      
       if ( this.move.piece === '' ) { // koma is not selected.
-        if ( koma.color === this.turn ) { // turn check
+        if ( koma.color === this.boardData.color ) { // turn check
           this.startMove(koma, pos, e)
         }
       } else { // koma is already selected.
@@ -119,7 +115,7 @@ export default {
       }
     },
     handsClicked (koma, e) {
-      if ( koma.color === this.turn ) { // turn check
+      if ( koma.color === this.boardData.color ) { // turn check
         this.startMove(koma, undefined, e)
       }
     },

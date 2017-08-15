@@ -1,7 +1,7 @@
 import _ from 'lodash'
 // https://github.com/na2hiro/json-kifu-format
 class Board {
-  constructor (contents, hands) {
+  constructor (contents, hands, color = 0) {
     this.contents = contents.map(arr => {
       return arr.map(pair => {
         if (pair.kind === undefined) {
@@ -12,6 +12,7 @@ class Board {
       })
     })
     this.hands = hands
+    this.color = color    // 初手の手番 (先手、後手どちらからの局面か)
   }
   // get koma @ pos
   // pos: {x: x, y: y} or {color: 0|1}
@@ -30,6 +31,7 @@ class Board {
     this.put(pos, Koma.empty())
     return koma
   }
+  // 持駒処理
   addHands (koma) {
     let kind = koma.kind
     if (koma.isPromoted()) {
@@ -39,6 +41,10 @@ class Board {
   }
   removeHands (koma) {    
     this.hands[koma.color][koma.kind] -= 1
+  }
+  // 手番変更
+  toggleTurn () {
+    this.color = changeColor(this.color)
   }
   
   runMove (move) {
@@ -59,6 +65,7 @@ class Board {
       koma = koma.promote()
     }
     this.put(move.to, koma)
+    this.toggleTurn()
   }
   // 逆
   revMove (move) {
@@ -76,6 +83,7 @@ class Board {
       }
       this.put(move.from, koma)
     }
+    this.toggleTurn()
   }
 
   isValidMove (move, nifucheck = true) {
@@ -383,6 +391,14 @@ class Koma {
 
 class Move {
   constructor (params) {
+    // color
+    // from
+    // to
+    // piece
+    // same
+    // promote
+    // capture
+    // relative
     Object.assign(this, params)    
   }
   
@@ -465,6 +481,24 @@ class MoveList {
   }
 }
 
+class Game {
+  constructor (jkf) {
+    // board:
+    // moves:
+    if (jkf.hasOwnProperty('initial')) {      
+      if (jkf.initial.preset === 'OTHER') {
+        this.board = new Board(jkf.initial.data.board,
+                               jkf.initial.data.hands,
+                               jkf.initial.data.color)
+      } else {
+        this.board = boardPresets[jkf.initial.preset]
+      }
+    } else {
+      this.board = boardPresets['HIRATE']
+    }
+  }
+}
+
 const boardPresets = {
   HIRATE: new Board([
     [{color:1, kind:'KY'}, {                    },{color:1, kind:'FU'}, {}, {}, {}, {color:0, kind:'FU'}, {                  }, {color:0, kind:'KY'}],
@@ -491,8 +525,5 @@ export default {
   MoveList,
   kansuji (i) {
     return '〇一二三四五六七八九'[i]
-  },
-  changeTurn (turn) {
-    return turn === 0 ? 1 : 0
   }
 }

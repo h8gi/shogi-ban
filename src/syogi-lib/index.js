@@ -402,14 +402,19 @@ class Koma {
 
 class Move {
   constructor (params) {
-    // color
-    // from
-    // to
-    // piece
-    // same
-    // promote
-    // capture
-    // relative
+    // comments:
+    // move: 
+    //   color
+    //   from
+    //   to
+    //   piece
+    //   same
+    //   promote
+    //   capture
+    //   relative
+    // time:
+    // special:
+    // forks:
     Object.assign(this, params)    
   }
   
@@ -485,7 +490,7 @@ class Move {
 class MoveList {
   constructor (array) {
     this.contents = array
-    this.index = 0
+    this.currentIndex = 0
   }
   push (move) {
     this.contents.push(move)    
@@ -494,23 +499,33 @@ class MoveList {
   pop () {
     return this.contents.pop()
   }
-  current () {
-    return this.contents[this.index]
+  get currentMove () {
+    return this.contents[this.currentIndex]
   }
-  last () {
-    return this.contents[this.contents.length-1]
+  get lastIndex () {
+    return this.contents.length-1
+  }
+  get lastMove () {
+    return this.contents[this.lastIndex]
   }
   isEmpty () {
     return this.contents.length === 0
   }
   backward () {
-    if (this.index > 0) {
-      this.index -= 1
+    if (this.currentIndex > 0) {
+      let move = this.currentMove
+      this.currentIndex -= 1
+      return move
+    } else {
+      return false
     }
   }
   forward () {
-    if (this.index < this.contents.length - 1) {
-      this.index += 1
+    if (this.currentIndex < this.contents.length - 1) {
+      this.currentIndex += 1
+      return true
+    } else {
+      return false
     }
   }
 }
@@ -530,19 +545,33 @@ class Game {
     } else {
       this.board = boardPresets['HIRATE']()
     }
-    this.moves = new MoveList([])
+    this.moves = new MoveList([{}])
   }
 
   addMove (move) {
     this.moves.push(move)
     this.board.runMove(move)
+    this.moves.currentIndex = this.moves.lastIndex
   }
 
   deleteMove () {
     let move = this.moves.pop()
     this.board.revMove(move)
+    this.moves.currentIndex = this.moves.lastIndex
   }
-  
+
+  forward () {
+    if (this.moves.forward()) {
+      this.board.runMove(this.moves.currentMove)
+    }    
+  }
+
+  backward () {
+    let move = this.moves.backward()
+    if (move) {
+      this.board.revMove(move)    
+    }
+  }
 }
 
 const boardPresets = {

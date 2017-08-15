@@ -1,8 +1,9 @@
 <template>
   <div class="move-list">
+    {{moves.currentIndex}}
     <ul>
-      <li v-for="m in moves.contents">
-        <a>{{m.toString()}}</a>
+      <li v-for="(m, i) in moves.contents">
+        {{i}} : {{i !== 0 ? m.toString() : ""}}
       </li>
     </ul>
     <div class="comment">

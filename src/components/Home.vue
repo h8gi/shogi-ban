@@ -41,15 +41,19 @@ export default {
   },
   computed: {
     latestMove () {
-      return this.game.moves.last()
+      if (this.game.moves.currentIndex > 0) {
+        return this.game.moves.currentMove
+      } else {
+        return null
+      }      
     }
   },
   methods: {
     handleForward () {
-      console.log('forward')
+      this.game.forward()
     },
     handleBackward () {
-      console.log('backward')
+      this.game.backward()
     },
     handleMove (move, elem) {
       this.playSounds()

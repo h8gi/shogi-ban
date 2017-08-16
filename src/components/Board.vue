@@ -182,7 +182,8 @@ export default {
           this.$emit('move', this.move) // emit move
           this.clearMove()          
         } else {
-          if (!this.move.isDrop() && this.koma.isPromotableAt(pos)) {
+          // if (!this.move.isDrop() && this.koma.isPromotableAt(pos)) {
+          if (this.move.isPromotable()) {
             this.askPromote()
           } else {
             this.$emit('move', this.move) // emit move
@@ -280,7 +281,7 @@ table.ban {
   }
   td:not(.header) {
     border: 2px #000 solid;
-    &.latest-move {    
+    .play &.latest-move {    
       background: #000;
       color: #fff;
     }

@@ -69,15 +69,12 @@ export default {
 
   #teban {
     font-weight: bold;
-    .play &.visible {
+    &.visible {
       visibility: visible;
     }
-    .play &.hidden {
+    &.hidden {
       visibility: hidden;
-    }
-    .edit & {
-      visibility: hidden;
-    }
+    }    
   }
 }
 

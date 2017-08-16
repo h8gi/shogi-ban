@@ -47,7 +47,7 @@ class Board {
     this.color = changeColor(this.color)
   }
   
-  runMove (move) {
+  runMove (move, toggle = true) {
     let koma = new Koma(move.color, move.piece)
     if (move.isDrop()) { // 打つ
       this.removeHands(koma)    // remove koma from `from` position.
@@ -65,10 +65,12 @@ class Board {
       koma = koma.promote()
     }
     this.put(move.to, koma)
-    this.toggleTurn()
+    if (toggle) {
+      this.toggleTurn()
+    }
   }
   // 逆
-  revMove (move) {
+  revMove (move, toggle = true) {
     this.take(move.to)  // remove koma from `to` position.
     let koma = move.koma
     if (move.isDrop()) { // 打つ     
@@ -83,7 +85,9 @@ class Board {
       }
       this.put(move.from, koma)
     }
-    this.toggleTurn()
+    if (toggle) {
+      this.toggleTurn()
+    }
   }
 
   isValidMove (move, nifucheck = true) {
@@ -485,6 +489,10 @@ class Move {
     return str
     
   }
+
+  isPromotable () {
+    return !this.isDrop() && ( this.koma.isPromotableAt(this.from) || this.koma.isPromotableAt(this.to) )
+  }
 }
 
 class MoveList {
@@ -507,6 +515,9 @@ class MoveList {
   }
   get lastMove () {
     return this.contents[this.lastIndex]
+  }
+  get isLast () {
+    return this.currentIndex === this.lastIndex
   }
   isEmpty () {
     return this.contents.length === 0
@@ -548,32 +559,43 @@ class Game {
     this.moves = new MoveList([{}])
   }
 
-  addMove (move) {
+  addMove (move, toggle = true) {
     this.moves.push(move)
-    this.board.runMove(move)
+    this.board.runMove(move, toggle)
     this.moves.currentIndex = this.moves.lastIndex
   }
 
-  deleteMove () {
-    let islast = this.moves.currentIndex === this.moves.lastIndex
-    let move = this.moves.pop()
-    this.board.revMove(move)
+  deleteMove (toggle = true) {
+    let islast = this.moves.isLast
+    let move = this.moves.pop()    
     if (islast) {
       this.moves.currentIndex = this.moves.lastIndex
-    }    
+      this.board.revMove(move, toggle)
+    } 
   }
 
   forward () {
     if (this.moves.forward()) {
       this.board.runMove(this.moves.currentMove)
-    }    
+      return true
+    }
+    return false
   }
 
   backward () {
     let move = this.moves.backward()
     if (move) {
-      this.board.revMove(move)    
+      this.board.revMove(move)
+      return true
     }
+    return false
+  }
+
+  gotoStart () {
+    while (this.backward()) {}
+  }
+  gotoEnd () {
+    while (this.forward()) {}
   }
 }
 

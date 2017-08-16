@@ -1,19 +1,16 @@
 <template>
   <div class="move-list">
-    {{moves.currentIndex}}
     <ul>
       <li v-for="(m, i) in moves.contents"
+          v-if="i !== 0"
           :class="moves.currentIndex === i ? 'current' : ''"
           tabindex="0">
         {{i}} : {{i !== 0 ? m.toString() : ""}}
       </li>
     </ul>
     <div class="comment">
-      {{moves.currentMove}}
+      {{moves.currentIndex}}手目: {{moves.currentMove}}
     </div>
-    <button @click="back">&lt;</button>
-    
-    <button @click="forward">&gt;</button>
   </div>
 </template>
 
@@ -57,12 +54,14 @@ export default {
     padding: 0;
     width: 140px;
     height: 160px;
-    overflow: auto;
+    overflow: scroll;
     li {
       list-style: none;
       cursor: pointer;
       @include no-select;
       padding-left: 1px;
+      display: inline-block;
+      width: 100%;
       &:focus {
         outline: none;
       }

@@ -7,10 +7,7 @@
           tabindex="0">
         {{i}} : {{i !== 0 ? m.toString() : ""}}
       </li>
-    </ul>
-    <div class="comment">
-      {{moves.currentIndex}}手目: {{moves.currentMove}}
-    </div>
+    </ul>    
   </div>
 </template>
 

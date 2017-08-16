@@ -26,6 +26,11 @@
       <button @click="handleForward">&gt;</button>
       <button @click="gotoEnd">&gt;&gt;</button>
       <button @click="remove">一手削除</button>
+      <div class="comment">
+        {{game.moves.currentIndex}}手目: {{game.moves.currentMove}}
+        <textarea cols="30" id="" name="" rows="10">        
+        </textarea>
+      </div>
     </div>
 
     

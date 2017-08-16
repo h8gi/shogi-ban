@@ -20,17 +20,14 @@
     </div>
     
     <div v-else class="controller">
-      <move-list :moves="game.moves"></move-list>
+      <move-list :moves="game.moves"
+                 @goto="handleGoto"
+                 @edit-comments="handleEditComments"></move-list>
       <button @click="gotoStart">&lt;&lt;</button>
       <button @click="handleBackward">&lt;</button>
       <button @click="handleForward">&gt;</button>
       <button @click="gotoEnd">&gt;&gt;</button>
-      <button @click="remove">一手削除</button>
-      <div class="comment">
-        {{game.moves.currentIndex}}手目: {{game.moves.currentMove}}
-        <textarea cols="30" id="" name="" rows="10">        
-        </textarea>
-      </div>
+      <button @click="remove">一手削除</button>      
     </div>
 
     
@@ -76,6 +73,9 @@ export default {
       if (!this.editMode && this.game.backward()) {
         this.playSounds()
       }
+    },
+    handleGoto (n) {
+      this.game.goto(n)
     },
     gotoStart () {
       this.game.gotoStart()

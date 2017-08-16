@@ -419,7 +419,7 @@ class Move {
     // time:
     // special:
     // forks:
-    Object.assign(this, params)    
+    Object.assign(this, params)
   }
   
   isDrop () {
@@ -596,6 +596,12 @@ class Game {
   }
   gotoEnd () {
     while (this.forward()) {}
+  }
+  goto (n) {
+    this.gotoStart()
+    for (let i = 0; i < n; i++) {
+      this.forward()
+    }
   }
 }
 

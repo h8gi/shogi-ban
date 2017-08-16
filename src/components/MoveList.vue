@@ -4,10 +4,19 @@
       <li v-for="(m, i) in moves.contents"
           v-if="i !== 0"
           :class="moves.currentIndex === i ? 'current' : ''"
-          tabindex="0">
-        {{i}} : {{i !== 0 ? m.toString() : ""}}
+          tabindex="0"
+          @click="handleClick(i)">
+        {{i}} : {{m.toString()}}
       </li>
-    </ul>    
+    </ul>
+    <div class="move-info">
+      <div :class="moves.currentIndex !== 0 ? 'show' : 'hidden'">
+        {{moves.currentIndex}}手目: {{moves.currentMove.toString()}}
+      </div>
+      <textarea cols="30" id="" name="" rows="10"
+                v-model.lazy.trim="moves.currentMove.comments">
+      </textarea>
+      </div>
   </div>
 </template>
 
@@ -23,17 +32,14 @@ export default {
     }
   },
   data () {
-    return {    
+    return {
     }
   },
   computed: {
   },
   methods: {
-    back () {
-      this.$emit('back')
-    },
-    forward () {
-      this.$emit('forward')
+    handleClick (i) {
+      this.$emit('goto', i)      
     }
   },
   updated () {
@@ -68,6 +74,11 @@ export default {
         font-weight: bold;
         padding-left: 2px;
       }
+    }
+  }
+  .move-info {
+    .hidden {
+      visibility: hidden;
     }
   }
 }

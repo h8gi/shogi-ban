@@ -19,22 +19,20 @@
       <button @click="clearBoard">初期化</button>
     </div>
     
-    <div v-else class="controller">
-      <move-list :moves="game.moves"
-                 @goto="handleGoto"></move-list>
-      <div class="move-info">
-        <div :class="game.moves.currentIndex !== 0 ? 'show' : 'hidden'">
-          {{game.moves.currentIndex}}手目: {{game.moves.currentMove.toString()}}
-        </div>
-        <textarea cols="30" id="" name="" rows="10"
-                  v-model.lazy.trim="game.moves.currentMove.comments">
-        </textarea>
+    <div v-else class="moves">
+      <div class="table">
+        <move-list :moves="game.moves"
+                   @goto="handleGoto"></move-list>
+        <move-info :move="game.moves.currentMove"
+                   :index="game.moves.currentIndex"></move-info>
       </div>
-      <button @click="gotoStart">&lt;&lt;</button>
-      <button @click="handleBackward">&lt;</button>
-      <button @click="handleForward">&gt;</button>
-      <button @click="gotoEnd">&gt;&gt;</button>
-      <button @click="remove">一手削除</button>      
+      <div class="controller">
+        <button @click="handleGotoStart">&lt;&lt;</button>
+        <button @click="handleBackward">&lt;</button>
+        <button @click="handleForward">&gt;</button>
+        <button @click="handleGotoEnd">&gt;&gt;</button>
+        <button :class="game.moves.isLast ? 'show' : 'hidden'" @click="handleRemove">一手削除</button>
+      </div>      
     </div>
 
     
@@ -44,12 +42,14 @@
 <script>
 import Board from '@/components/Board'
 import MoveList from '@/components/MoveList'
+import MoveInfo from '@/components/MoveInfo'
 import syogi from '@/syogi-lib'
 export default {
   name: 'game',
   components: {
     Board,
-    MoveList
+    MoveList,
+    MoveInfo
   },
   data () {
     return {
@@ -84,10 +84,10 @@ export default {
     handleGoto (n) {
       this.game.goto(n)
     },
-    gotoStart () {
+    handleGotoStart () {
       this.game.gotoStart()
     },
-    gotoEnd () {
+    handleGotoEnd () {
       this.game.gotoEnd()
     },
     handleMove (move, elem) {
@@ -98,8 +98,8 @@ export default {
         // forks
       }
     },
-    remove () {
-      if (!this.editMode && !this.game.moves.isEmpty() && this.game.moves.lastIndex > 0) {
+    handleRemove () {
+      if (!this.game.moves.isEmpty() && this.game.moves.lastIndex > 0) {
         if (this.game.moves.isLast) {
           this.playSounds()
         }
@@ -144,14 +144,25 @@ export default {
   @include wide;
   &:focus {
     outline: none;
-  }  
-}
-.controller {
-  .move-info {
+  }
+  .moves {
+    position: relative;
+    margin: 20px auto;
+    text-align: center;
+    .table {
+      display: table;
+      margin: 0 auto;
+      padding-right: 165px;
+      .move-list, .move-info {
+        display: table-cell;
+        height: 240px;
+      }
+    }
     .hidden {
       visibility: hidden;
     }
   }
 }
+
 
 </style>

@@ -473,6 +473,9 @@ class Move {
   }
 
   toString () {
+    if (!this.hasOwnProperty('to')) {
+      return ''
+    }
     let str = color2kigou(this.color) + this.to.x + kansuji(this.to.y) + komaMap[this.piece].kanji
     if (this.promote === true) {
       str += '成'
@@ -484,8 +487,7 @@ class Move {
       str += '(' + this.from.x + kansuji(this.from.y) + ')'
     } else {
       str += '(打)'
-    }
-    
+    }    
     return str
     
   }
@@ -497,7 +499,7 @@ class Move {
 
 class MoveList {
   constructor (array) {
-    this.contents = array
+    this.contents = array.map(item => new Move(item))
     this.currentIndex = 0
   }
   push (move) {

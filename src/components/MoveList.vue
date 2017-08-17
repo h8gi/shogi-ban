@@ -1,6 +1,6 @@
 <template>
   <div class="move-list">
-    <ul>
+    <ul id="scroll-area">
       <li v-for="(m, i) in moves.contents"
           v-if="i !== 0"
           :class="moves.currentIndex === i ? 'current' : ''"
@@ -34,8 +34,15 @@ export default {
       this.$emit('goto', i)      
     }
   },
-  updated () {
-    console.log(this)
+  updated () {    
+    let ul = document.getElementById('scroll-area')
+    let li = ul.getElementsByClassName('current')[0]
+    if (li) {
+      console.log(li)      
+      ul.scrollTo(0, (this.moves.currentIndex - 1) * li.offsetHeight )
+    } else {
+      ul.scrollTo(0, 0)
+    }
   }
 }
 </script>
@@ -47,9 +54,13 @@ export default {
   ul {
     border: 2px solid #000;
     padding: 0;
+    margin-top: 18px;
+    margin-right: 15px;
     width: 140px;
-    height: 160px;
-    overflow: scroll;
+    height: 202px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    text-align: left;
     li {
       list-style: none;
       cursor: pointer;

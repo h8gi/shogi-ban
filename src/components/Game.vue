@@ -152,11 +152,13 @@ export default {
     .table {
       display: table;
       margin: 0 auto;
-      padding-right: 165px;
+      padding-right: 180px;
       .move-list, .move-info {
         vertical-align: top;
         display: table-cell;
         height: 240px;
+      }
+      .move-list {
       }
     }
     .hidden {

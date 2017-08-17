@@ -96,6 +96,7 @@ export default {
         this.game.addMove(move, !this.editMode)
       } else {
         // forks
+        console.log('todo: fork')
       }
     },
     handleRemove () {

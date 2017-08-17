@@ -561,7 +561,10 @@ class Game {
     } else {
       this.board = boardPresets['HIRATE']()
     }
-    this.moves = new MoveList([{}])
+    this.moves = new MoveList([{}])    
+    this.forks = []             // Game Array
+    this.forkid = null
+    this.parent = null
   }
 
   addMove (move, toggle = true) {
@@ -576,7 +579,7 @@ class Game {
     if (islast) {
       this.moves.currentIndex = this.moves.lastIndex
       this.board.revMove(move, toggle)
-    } 
+    }
   }
 
   forward () {
@@ -607,6 +610,17 @@ class Game {
     for (let i = 0; i < n; i++) {
       this.forward()
     }
+  }
+  // todo
+  addNewFork () {
+    let newGame = _.deepCopy(this)
+    newGame.parent = this
+    newGame.forkid = this.forks.length
+    this.forks.push(newGame)
+    return newGame.forkid
+  }
+  getFork (id) {
+    return this.forks[id]
   }
 }
 

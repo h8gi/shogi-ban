@@ -2,12 +2,10 @@
   <div class="move-list">
     <ul id="scroll-area">
       <li v-for="(m, i) in moves.contents"
-          v-if="i !== 0"
           :class="moves.currentIndex === i ? 'current' : ''"
           tabindex="0"
-          @click="handleClick(i)">
-        {{i}} : {{m.toString()}}
-      </li>
+          @click="handleClick(i)"
+          :title="m.comments">{{paddingSpace(i) + i}} : {{i === 0 ? "開始局面" : m.toString()}}</li>
     </ul>
   </div>
 </template>
@@ -27,21 +25,33 @@ export default {
     return {
     }
   },
-  computed: {
+  computed: {    
   },
   methods: {
+    digit (n) {
+      return String(n).length
+    },
+    maxDigit () {
+      return this.digit(this.moves.lastIndex)
+    },
+    paddingSpace (n) {
+      return new Array(this.maxDigit() - this.digit(n)).fill(' ').join('')
+    },
     handleClick (i) {
       this.$emit('goto', i)      
-    }
+    },
+    autoScroll () {
+      let ul = document.getElementById('scroll-area')
+      let li = ul.getElementsByClassName('current')[0]
+      if (li) {
+        ul.scrollTo(0, (this.moves.currentIndex - 1) * li.offsetHeight )
+      } else {
+        ul.scrollTo(0, 0)
+      }
+    }    
   },
   updated () {    
-    let ul = document.getElementById('scroll-area')
-    let li = ul.getElementsByClassName('current')[0]
-    if (li) {
-      ul.scrollTo(0, (this.moves.currentIndex - 1) * li.offsetHeight )
-    } else {
-      ul.scrollTo(0, 0)
-    }
+    this.autoScroll()
   }
 }
 </script>
@@ -55,7 +65,7 @@ export default {
     padding: 0;
     margin-top: 18px;
     margin-right: 15px;
-    width: 140px;
+    width: 160px;
     height: 202px;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -64,7 +74,8 @@ export default {
       list-style: none;
       cursor: pointer;
       @include no-select;
-      padding-left: 1px;
+      padding-left: 5px;
+      white-space: pre;
       display: inline-block;
       width: 100%;
       &:focus {
@@ -74,7 +85,7 @@ export default {
       &.current {
         background: #eee;
         font-weight: bold;
-        padding-left: 3px;
+        padding-left: 6px;
       }
     }
   }

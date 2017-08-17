@@ -3,8 +3,9 @@
     <div>
       {{index}}手目: {{move.toString()}}
     </div>
-    <textarea id="" name=""
-              v-model.lazy.trim="move.comments">
+    <textarea id="" name=""              
+              v-model.trim="move.comments"
+              >
     </textarea>
   </div>
 </template>
@@ -12,7 +13,7 @@
 <script>
 import syogi from '@/syogi-lib'
 export default {
-  name: 'move-list',
+  name: 'move-info',
   components: {
   },
   props: {

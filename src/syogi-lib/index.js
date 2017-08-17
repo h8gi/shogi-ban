@@ -521,6 +521,9 @@ class MoveList {
   get isLast () {
     return this.currentIndex === this.lastIndex
   }
+  get length () {
+    return this.contents.length
+  }
   isEmpty () {
     return this.contents.length === 0
   }

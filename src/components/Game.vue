@@ -154,6 +154,7 @@ export default {
       margin: 0 auto;
       padding-right: 165px;
       .move-list, .move-info {
+        vertical-align: top;
         display: table-cell;
         height: 240px;
       }

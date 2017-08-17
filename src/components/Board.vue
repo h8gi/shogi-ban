@@ -243,6 +243,9 @@ export default {
     },
     getKomaAt (pos) {
     }
+  },
+  updated () {
+    this.clearMove()
   }
 }
 </script>

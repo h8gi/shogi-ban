@@ -38,7 +38,6 @@ export default {
     let ul = document.getElementById('scroll-area')
     let li = ul.getElementsByClassName('current')[0]
     if (li) {
-      console.log(li)      
       ul.scrollTo(0, (this.moves.currentIndex - 1) * li.offsetHeight )
     } else {
       ul.scrollTo(0, 0)

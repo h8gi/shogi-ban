@@ -10,12 +10,12 @@
 </template>
 
 <script>
-import syogi from '@/syogi-lib'
+import shogi from '@/shogi-lib'
 export default {
   name: 'koma',
   components: {
   },
-  // contents is syogi.Koma.
+  // contents is shogi.Koma.
   props: ['contents', 'pos'],
   data () {
     return {    

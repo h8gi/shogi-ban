@@ -43,7 +43,7 @@
 import Board from '@/components/Board'
 import MoveList from '@/components/MoveList'
 import MoveInfo from '@/components/MoveInfo'
-import syogi from '@/syogi-lib'
+import shogi from '@/shogi-lib'
 export default {
   name: 'game',
   components: {
@@ -53,7 +53,7 @@ export default {
   },
   data () {
     return {
-      game: new syogi.Game({}),
+      game: new shogi.Game({}),
       reverse: false,
       showNum: true,
       editMode: false,
@@ -111,7 +111,7 @@ export default {
       this.reverse = (!this.reverse)
     },
     clearBoard () {
-      this.game.board = syogi.boardPresets.HIRATE()
+      this.game.board = shogi.boardPresets.HIRATE()
     },
     toggleNum () {
       this.showNum = (!this.showNum)
@@ -124,7 +124,7 @@ export default {
     },
     toggleEdit () {
       this.editMode = !this.editMode
-      this.game.moves = new syogi.MoveList([{}])
+      this.game.moves = new shogi.MoveList([{}])
     },
     playSounds () {
       if (this.sounds) {

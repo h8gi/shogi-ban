@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import syogi from '@/syogi-lib'
+import shogi from '@/shogi-lib'
 export default {
   name: 'hands',
   components: {
@@ -34,10 +34,10 @@ export default {
   },
   methods: {
     kanji (kind) {
-      return syogi.Koma.kind2kanji(kind)
+      return shogi.Koma.kind2kanji(kind)
     },
     click (color, kind, e) {
-      this.$emit('hands-koma-clicked', new syogi.Koma(color, kind), e)
+      this.$emit('hands-koma-clicked', new shogi.Koma(color, kind), e)
     },
     handsClick (color) {
       this.$emit('hands-clicked', color)

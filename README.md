@@ -1,4 +1,4 @@
-# syogi-ban
+# shogi-ban
 
 > 将棋盤
 

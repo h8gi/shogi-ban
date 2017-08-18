@@ -11,14 +11,14 @@
 </template>
 
 <script>
-import syogi from '@/syogi-lib'
+import shogi from '@/shogi-lib'
 export default {
   name: 'move-info',
   components: {
   },
   props: {
     move: {
-      type: syogi.Move
+      type: shogi.Move
     },
     index: {
       type: Number

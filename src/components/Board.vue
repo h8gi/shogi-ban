@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import syogi from '@/syogi-lib'
+import shogi from '@/shogi-lib'
 import Koma from '@/components/Koma.vue'
 import Hands from '@/components/Hands.vue'
 import alertify from 'alertifyjs'
@@ -42,7 +42,7 @@ export default {
     return {
       jun: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       gyaku: [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
-      move: new syogi.Move({
+      move: new shogi.Move({
         from: {},
         to: {},
         piece: '',
@@ -54,13 +54,13 @@ export default {
   computed: {
     koma () {
       if ( this.move.piece === '' ) {
-        return syogi.Koma.empty()
+        return shogi.Koma.empty()
       }
-      return new syogi.Koma(this.move.color, this.move.piece)
+      return new shogi.Koma(this.move.color, this.move.piece)
     },
   },
   props: {
-    boardData: syogi.Board,
+    boardData: shogi.Board,
     reverse: {
       type: Boolean,
       default: false
@@ -91,7 +91,7 @@ export default {
         cls += this.showNum ? '' : 'hide '        
         cls += x === 0 ? 'y-header ' : ''
         cls += y === 0 ? 'x-header ' : ''
-      } else if (syogi.Board.isEdge({x: x, y: y})) {
+      } else if (shogi.Board.isEdge({x: x, y: y})) {
         cls += 'edge '        
         cls += x === 1 ? 'right ' : ''
         cls += x === 9 ? 'left ' : ''
@@ -152,7 +152,7 @@ export default {
     },
     startMove (koma, pos, e) {
       this.clearMove()
-      this.move = new syogi.Move({
+      this.move = new shogi.Move({
         from: pos,
         to: {},
         piece: koma.kind,
@@ -164,7 +164,7 @@ export default {
     },
     // clear the data 'move'
     clearMove () {
-      this.move = new syogi.Move({
+      this.move = new shogi.Move({
         from: {},
         to: {},
         piece: '',
@@ -239,7 +239,7 @@ export default {
         }).setHeader(' ')
     },
     kansuji (i) {
-      return syogi.kansuji(i)
+      return shogi.kansuji(i)
     },
     getKomaAt (pos) {
     }

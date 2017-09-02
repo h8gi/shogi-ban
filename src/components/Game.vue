@@ -3,12 +3,12 @@
        :class="editMode ? 'edit' : 'play'"
        @keyup.right="handleForward"
        @keyup.left="handleBackward">
+    <div>{{name}}</div>
+    <button @click="save">保存</button>
     <button @click="invert">盤反転</button>
     <button @click="toggleNum">盤数字</button>
     <button @click="toggleSounds">音を{{ sounds ? "OFF" : "ON"}}に</button>        
     <button @click="toggleEdit">{{editMode ? "普通へ" : "編集モードへ"}}</button>
-    <button @click="test">test</button>
-    
     <board :board-data="game.board" :reverse="reverse" :show-num="showNum"
            @move="handleMove"
            :class="'turn-'+game.board.color"
@@ -35,7 +35,6 @@
         <button :class="game.moves.isLast ? 'show' : 'hidden'" @click="handleRemove">一手削除</button>
       </div>      
     </div>
-
     
   </div>
 </template>
@@ -45,6 +44,8 @@ import Board from '@/components/Board'
 import MoveList from '@/components/MoveList'
 import MoveInfo from '@/components/MoveInfo'
 import shogi from '@/shogi-lib'
+import db from '@/shogi-lib/database'
+
 export default {
   name: 'game',
   components: {
@@ -55,6 +56,7 @@ export default {
   data () {
     return {
       game: new shogi.Game({}),
+      name: this.$route.params.name,
       reverse: false,
       showNum: true,
       editMode: false,
@@ -135,9 +137,21 @@ export default {
         this.komaoto.play()
       }
     },
-    test () {
-      this.game = new shogi.Game(this.game.toObj())
+    save () {
+      this.game.save(this.name).then(
+        alert('保存しました')
+      ).catch(err => {
+        alert('保存失敗しました')
+      })
     }
+  },  
+  created () {
+    db.kifu.get(this.$route.params.name).then(data => {
+      this.name = data.name
+      console.log(data.obj)
+      this.game = new shogi.Game(data.obj)
+    }).catch(err => {      
+    })
   }
 }
 </script>

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import db from './database'
 // https://github.com/na2hiro/json-kifu-format
 class Board {
   constructor (contents, hands, color = 0) {
@@ -586,6 +587,9 @@ class Game {
     }
   }
   
+  save (name) {
+    return db.kifu.put({name: name, obj: this.toObj()})
+  }
   
   addMove (move, toggle = true) {
     this.moves.push(move)

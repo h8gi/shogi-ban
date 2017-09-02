@@ -5,7 +5,7 @@
     </div>
     <textarea id="" name=""              
               v-model.trim="move.comments"
-              >
+              @keyup.prevent.stop>
     </textarea>
   </div>
 </template>

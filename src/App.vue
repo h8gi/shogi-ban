@@ -1,5 +1,9 @@
 <template>
   <main id="app">
+    <p>
+      <router-link to="/">ゲーム</router-link>
+      <router-link to="/games">棋譜一覧</router-link>
+    </p>
     <router-view></router-view>
   </main>
 </template>

@@ -547,26 +547,46 @@ class MoveList {
 }
 
 class Game {
-  constructor (jkf) {
+  constructor (obj) {
     // board:
     // moves:
-    if (jkf.hasOwnProperty('initial')) {      
-      if (jkf.initial.preset === 'OTHER') {
-        this.board = new Board(jkf.initial.data.board,
-                               jkf.initial.data.hands,
-                               jkf.initial.data.color)
+    if (obj.hasOwnProperty('initial')) {      
+      if (obj.initial.preset === 'OTHER') {
+        this.board = new Board(obj.initial.data.board,
+                               obj.initial.data.hands,
+                               obj.initial.data.color)
       } else {
-        this.board = boardPresets[jkf.initial.preset]()
+        this.board = boardPresets[obj.initial.preset]()
       }
     } else {
       this.board = boardPresets['HIRATE']()
     }
-    this.moves = new MoveList([{}])    
+    if (obj.hasOwnProperty('moves')) {
+      this.moves = new MoveList(obj.moves.contents)
+      this.moves.currentIndex = obj.moves.currentIndex
+    } else {
+      this.moves = new MoveList([{}])
+    }
     this.forks = []             // Game Array
     this.forkid = null
     this.parent = null
   }
 
+  toObj () {
+    return {
+      initial: {
+        data: {
+          board: this.board.contents,
+          hands: this.board.hands,
+          color: this.board.color
+        },
+        preset: 'OTHER'
+      },
+      moves: this.moves
+    }
+  }
+  
+  
   addMove (move, toggle = true) {
     this.moves.push(move)
     this.board.runMove(move, toggle)
@@ -611,6 +631,7 @@ class Game {
       this.forward()
     }
   }
+  
   // todo
   addNewFork () {
     let newGame = _.deepCopy(this)

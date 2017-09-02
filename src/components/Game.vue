@@ -7,6 +7,7 @@
     <button @click="toggleNum">盤数字</button>
     <button @click="toggleSounds">音を{{ sounds ? "OFF" : "ON"}}に</button>        
     <button @click="toggleEdit">{{editMode ? "普通へ" : "編集モードへ"}}</button>
+    <button @click="test">test</button>
     
     <board :board-data="game.board" :reverse="reverse" :show-num="showNum"
            @move="handleMove"
@@ -133,6 +134,9 @@ export default {
         }
         this.komaoto.play()
       }
+    },
+    test () {
+      this.game = new shogi.Game(this.game.toObj())
     }
   }
 }
